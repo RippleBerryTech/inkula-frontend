@@ -1,0 +1,131 @@
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import appSetting from '../app-setting';
+import { useAppStore } from '../stores/index';
+
+import { RouterView } from 'vue-router';
+import HomeView from '../views/index.vue';
+
+const routes: RouteRecordRaw[] = [
+    {
+        path: '/',
+        name: 'home',
+        component: HomeView,
+        meta: { requiresAuth: true },
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: () => import('../views/auth/login.vue'),
+        meta: { layout: 'auth', },
+    },
+    {
+        path: '/register',
+        name: 'register',
+        component: () => import('../views/auth/register.vue'),
+        meta: { layout: 'auth' },
+    },
+    {
+        path: '/otp',
+        name: 'otp',
+        component: () => import('../views/auth/otp.vue'),
+        meta: { layout: 'auth' },
+    },
+    {
+        path: '/forgot-password',
+        name: 'forgot-password',
+        component: () => import('../views/auth/forgot-password.vue'),
+        meta: { layout: 'auth' },
+    },
+    {
+        path: '/roles',
+        component: RouterView,                // wrapper that renders the children
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'list',
+                name: 'roles-list',
+                component: () => import('../../src/views/user-management/role/index.vue'),
+            },
+            {
+                path: 'add',
+                name: 'role-add',
+                component: () => import('../../src/views/user-management/role/add.vue'),
+            },
+            {
+                path: ':id/edit',
+                name: 'role-edit',
+                props: true,
+                component: () => import('../../src/views/user-management/role/edit.vue'),
+            },
+        ],
+    },
+    {
+        path: '/users',
+        component: RouterView,                // wrapper that renders the children
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'list',
+                name: 'users-list',
+                component: () => import('../../src/views/user-management/user/index.vue'),
+            },
+            {
+                path: 'add',
+                name: 'user-add',
+                component: () => import('../../src/views/user-management/user/add.vue'),
+            },
+            {
+                path: ':id/edit',
+                name: 'user-edit',
+                props: true,
+                component: () => import('../../src/views/user-management/user/edit.vue'),
+            },
+        ],
+    },
+    // optional fallback
+    {
+        path: '/:catchAll(.*)',
+        name: 'not-found',
+        component: () => import('../views/pages/error404.vue'),
+        meta: { layout: 'auth' },
+    },
+];
+
+const router = createRouter({
+    history: createWebHistory(),
+    linkExactActiveClass: 'active',
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        return savedPosition || { left: 0, top: 0 };
+    },
+});
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+  const isAuthenticated = !!token;
+
+  // Set layout
+  const store = useAppStore();
+  store.setMainLayout(to.meta?.layout === 'auth' ? 'auth' : 'app');
+
+  // Auth protection
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    return next({ name: 'login' });
+  }
+
+  if (to.meta.guestOnly && isAuthenticated) {
+    return next({ name: 'home' });
+  }
+
+  next();
+});
+
+
+// changed signature: no `next()` in afterEach
+router.afterEach(() => {
+    appSetting.changeAnimation();
+});
+
+export default router;
+export const appRouter = router;
+
