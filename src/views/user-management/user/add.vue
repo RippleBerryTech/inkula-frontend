@@ -98,6 +98,7 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
 import { useUserStore } from '../../../stores/user-management/user';
+import { appRouter } from '@/router';
 useMeta({ title: 'Add User' });
 // Reactive form data
 const form = reactive({
@@ -146,6 +147,7 @@ const submitForm = async () => {
       $v.value.$reset()
       isSubmitForm.value = false
 
+      await appRouter.push('/users/list')
       //show success message
       toast.success("User added successfully");
     }

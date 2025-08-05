@@ -7,7 +7,7 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link to="/roles/add" class="btn btn-primary">Add Role</router-link>
+                <router-link to="/roles/add" v-if="hasPermission('Add Role')" class="btn btn-primary">Add Role</router-link>
             </div>
 
             <div class="datatable">
@@ -44,14 +44,14 @@
                     </template>
                     <template #action="data">
                         <div class="flex items-center">
-                            <div>
-                                <router-link :to="{ name: 'role-edit', params: { id: data.value.id } }"
+                            <div v-if="data.value.id !== 1">
+                                <router-link v-if="hasPermission('Edit Role')" :to="{ name: 'role-edit', params: { id: data.value.id } }"
                                     class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
                                     <IconEdit :size="20" stroke-width="1.5" />
                                 </router-link>
                             </div>
-                            <div>
-                                <button type="button" v-tippy:delete>
+                            <div  v-if="data.value.id !== 1">
+                                <button v-if="hasPermission('Delete Role')" type="button" v-tippy:delete>
                                     <IconTrash :size="20" stroke-width="1.5"  @click="deleteRoleModal = true; selectRoleId = data.value.id"/>
                                 </button>
                             </div>
@@ -141,7 +141,7 @@
                                     <button type="button" @click="deleteRoleModal = false"
                                         class="btn btn-outline-danger">Cancel</button>
                                     <button type="button" @click="deleteRole"
-                                        class="btn btn-gradient ltr:ml-4 rtl:mr-4">Delete</button>
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4">Delete</button>
                                 </div>
                             </div>
                         </DialogPanel>
@@ -163,9 +163,13 @@ import 'swiper/css/pagination';
 import { computed, ref } from 'vue';
 import { useMeta } from '../../../composables/use-meta';
 
+import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useRoleStore } from '../../../stores/user-management/role/index';
+
+const { hasRole, hasPermission } = usePermissions()
+
 useMeta({ title: 'Roles' });
 const search = ref('');
 const columns =

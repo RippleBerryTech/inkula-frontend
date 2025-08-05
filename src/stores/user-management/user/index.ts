@@ -52,7 +52,7 @@ export const useUserStore = defineStore('user', {
       try {
         const res = await api.post('/users/store', data);
         if (res.data.success) {
-          this.users.push(res.data.data);
+          this.users.push(res.data.data.user);
           return res.data.success;
         } else {
           this.addUserError = res.data.message;
@@ -91,11 +91,12 @@ export const useUserStore = defineStore('user', {
       this.updateUserError = '';
       this.loading = true;
       try {
-        const res = await api.post(`/users/update/${data.id}`, data);
+        var res = await api.put(`/users/update/${data.id}`, data);
+        
         if (res.data.success) {
           this.users = this.users.map((user) => {
-            if (user.id === data.id) {
-              return res.data.data;
+            if (user.id == data.id) {
+              return res.data.data.user;
             }
             return user;
           });

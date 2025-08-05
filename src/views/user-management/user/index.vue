@@ -7,7 +7,7 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link to="/users/add" class="btn btn-gradient">Add User</router-link>
+                <router-link to="/users/add" v-if="hasPermission('Add User')" class="btn btn-primary">Add User</router-link>
             </div>
 
             <div class="datatable">
@@ -48,14 +48,14 @@
                     </template>
                     <template #action="data">
                         <div class="flex items-center">
-                            <div>
-                                <router-link :to="{ name: 'user-edit', params: { id: data.value.id } }"
+                            <div v-if="data.value.id !== 1">
+                                <router-link v-if="hasPermission('Edit User')" :to="{ name: 'user-edit', params: { id: data.value.id } }"
                                     class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
                                     <IconEdit :size="20" stroke-width="1.5" />
                                 </router-link>
                             </div>
-                            <div>
-                                <button type="button" v-tippy:delete>
+                            <div v-if="data.value.id !== 1">
+                                <button v-if="hasPermission('Delete User')" type="button" v-tippy:delete>
                                     <IconTrash :size="20" stroke-width="1.5"  @click="deleteUserModal = true; selectedUserId = data.value.id"/>
                                 </button>
                             </div>
@@ -96,7 +96,7 @@
                                     <button type="button" @click="deleteUserModal = false"
                                         class="btn btn-outline-danger">Cancel</button>
                                     <button type="button" @click="deleteUser"
-                                        class="btn btn-gradient ltr:ml-4 rtl:mr-4">Delete</button>
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4">Delete</button>
                                 </div>
                             </div>
                         </DialogPanel>
@@ -115,9 +115,12 @@ import { IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
 import { computed, ref } from 'vue';
 import { useMeta } from '../../../composables/use-meta';
 
+import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useUserStore } from '../../../stores/user-management/user';
+
+const { hasRole, hasPermission } = usePermissions()
     useMeta({ title: 'Users' });
     const search = ref('');
     const columns =

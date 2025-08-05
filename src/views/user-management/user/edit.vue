@@ -143,7 +143,10 @@ const submitForm = async () => {
       role: form.role
     })
     if (ok) {
+      await router.push('/users/list')
       toast.success("User updated successfully");
+    } else {
+      toast.error(userStore.updateUserError);
     }
 
 }

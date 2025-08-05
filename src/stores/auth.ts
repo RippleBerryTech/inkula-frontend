@@ -9,6 +9,8 @@ export const useAuthStore = defineStore('auth', {
         loading: false,
         message: '',
         emailForOTP: '',
+        roles: [] as string[],
+        permissions: [] as string[],
     }),
 
     actions: {
@@ -62,6 +64,8 @@ export const useAuthStore = defineStore('auth', {
                     this.message = res.data.message;
                     this.token = res.data.data.token;
                     localStorage.setItem('token', this.token);
+                    // 👇 Fetch user info (sets user, roles, permissions in store)
+                    await this.fetchUser();
                     return res.data.success;
                 } else {
                     this.error = res.data.message;
@@ -101,6 +105,8 @@ export const useAuthStore = defineStore('auth', {
                     this.token = '';
                     this.user = null;
                     localStorage.removeItem('token');
+                    localStorage.removeItem('roles')
+                    localStorage.removeItem('permissions')
                     return res.data.success;
                 } else {
                     this.error = res.data.message;
@@ -113,14 +119,27 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async fetchUser() {
+            if (!this.token) return
+
+            this.loading = true
             try {
-                const res = await api.get('/user');
-                this.user = res.data;
+                const res = await api.get('/user')
+                const { roles, permissions, ...userData } = res.data
+
+                this.user = userData
+                this.roles = roles
+                this.permissions = permissions
             } catch (err: any) {
-                this.error = err.response?.data?.message || 'Failed to fetch user';
+                console.error('Failed to fetch user:', err)
+                this.user = null
+                this.roles = []
+                this.permissions = []
+                localStorage.removeItem('token')
+                this.token = ''
             } finally {
-                this.loading = false;
+                this.loading = false
             }
-        },
+        }
+
     },
 });

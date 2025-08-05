@@ -34,7 +34,7 @@
                             </router-link>
                         </li>
 
-                        <h2 class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                        <h2 v-if="hasPermission('View Role') || hasPermission('View User')" class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                             <svg
                                 class="w-4 h-5 flex-none hidden"
                                 viewBox="0 0 24 24"
@@ -49,9 +49,9 @@
                             <span>USER MANAGEMENT</span>
                         </h2>
 
-                        <li class="nav-item">
+                        <li v-if="hasPermission('View Role') || hasPermission('View User')" class="nav-item">
                             <ul>
-                                <li class="nav-item">
+                                <li v-if="hasPermission('View Role')" class="nav-item">
                                     <router-link to="/roles/list" class="group" @click="toggleMobileMenu" :class="{ active: isRolesSection }">
                                         <div class="flex items-center">
                                             <IconLock :size="20" stroke-width="1.5" />
@@ -61,7 +61,7 @@
                                         </div>
                                     </router-link>
                                 </li>
-                                <li class="nav-item">
+                                <li v-if="hasPermission('View User')" class="nav-item">
                                     <router-link to="/users/list" class="group" @click="toggleMobileMenu" :class="{ active: isUsersSection }">
                                         <div class="flex items-center">
                                             <IconUsersGroup :size="20" stroke-width="1.5" />
@@ -955,10 +955,13 @@
 <script lang="ts" setup>
     import { onMounted, ref } from 'vue';
 
-    import { IconChevronsLeft, IconHome2, IconLock, IconUsersGroup } from '@tabler/icons-vue';
+    import { usePermissions } from '@/composables/usePermissions';
+import { IconChevronsLeft, IconHome2, IconLock, IconUsersGroup } from '@tabler/icons-vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppStore } from '../../stores/index';
+
+const { hasRole, hasPermission } = usePermissions()
 
     const route = useRoute()
 

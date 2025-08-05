@@ -52,6 +52,7 @@ app.component('Popper', Popper);
 import vue3JsonExcel from 'vue3-json-excel';
 app.use(vue3JsonExcel);
 
+import { useAuthStore } from '@/stores/auth';
 import Vue3Toastify from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
@@ -61,4 +62,9 @@ app.use(Vue3Toastify, {
   newestOnTop: true,
   theme: 'light', // 'dark' or 'colored'
 });
+
+const auth = useAuthStore()
+if (auth.token) {
+    auth.fetchUser()
+}
 app.mount('#app');
