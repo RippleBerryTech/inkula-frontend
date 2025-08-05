@@ -7,7 +7,7 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link to="/roles/add" class="btn btn-gradient">Add Role</router-link>
+                <router-link to="/roles/add" class="btn btn-primary">Add Role</router-link>
             </div>
 
             <div class="datatable">

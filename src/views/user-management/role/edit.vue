@@ -82,6 +82,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
 import { useRoleStore } from '../../../stores/user-management/role';
+import { appRouter } from '@/router';
 
 useMeta({ title: 'Edit Role' })
 
@@ -139,7 +140,10 @@ const submitForm = async () => {
   })
 
   if (ok) {
+    await appRouter.push('/roles/list')
     toast.success('Role updated successfully')
+  } else {
+    toast.error(roleStore.editRoleError)
   }
 }
 
@@ -172,7 +176,7 @@ onMounted(async () => {
     form.permissions = role.permissions,
     console.log('permissions', form.permissions)
   } else {
-    router.push('/roles/list')
+    await router.push('/roles/list')
     toast.error(roleStore.editRoleError || 'Role not found')
   }
 })

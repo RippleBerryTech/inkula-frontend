@@ -53,10 +53,10 @@
 
                 <div>
                   <span v-if="!roleStore.loading">
-                    <button type="submit" class="btn btn-gradient mt-0">Add</button>
+                    <button type="submit" class="btn btn-primary mt-0">Add</button>
                   </span>
                   <span v-else>
-                    <button type="button" class="btn btn-gradient mt-0" disabled>
+                    <button type="button" class="btn btn-primary mt-0" disabled>
                       Loading...
                     </button>
                   </span>
@@ -81,6 +81,7 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
 import { useRoleStore } from '../../../stores/user-management/role';
+import { appRouter } from '@/router';
 useMeta({ title: 'Add Role' });
 // Reactive form data
 const form = reactive({
@@ -113,18 +114,28 @@ const submitForm = async () => {
   await $v.value.$validate()
 
   if (!$v.value.$invalid) {
-    var res = await roleStore.addRole(form)
+    // Create a payload copy of the form and map permissions to only names
+    const payload = {
+      ...form,
+      permissions: form.permissions.map((p : any) => p.name),
+    }
+
+    console.log(JSON.stringify(payload, null, 2))
+
+    const res = await roleStore.addRole(payload)
     if (res) {
-      //reset form
+      // Reset form
       form.name = ''
       form.description = ''
       form.permissions = []
-      //reset validation
+
+      // Reset validation
       $v.value.$reset()
       isSubmitForm.value = false
 
-      //show success message
-      toast.success("Role added successfully");
+      await appRouter.push('/roles/list')
+      // Show success message
+      toast.success("Role added successfully")
     }
   } else {
     toast.error('Validation Failed')

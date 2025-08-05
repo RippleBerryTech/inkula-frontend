@@ -45,7 +45,7 @@ export const useRoleStore = defineStore('role', {
       try {
         const res = await api.post('/roles/store', data);
         if (res.data.success) {
-          this.roles.push(res.data.data);
+          this.roles.push(res.data.data.role);
           return res.data.success;
         } else {
           this.addRoleError = res.data.message;
@@ -84,11 +84,12 @@ export const useRoleStore = defineStore('role', {
       this.addRoleError = '';
       this.loading = true;
       try {
-        const res = await api.post(`/roles/update/${data.id}`, data);
+        const res = await api.put(`/roles/update/${data.id}`, data);
+        console.log(res);
         if (res.data.success) {
           this.roles = this.roles.map((role) => {
             if (role.id === data.id) {
-              return res.data.data;
+              return res.data.data.role;
             }
             return role;
           });
@@ -130,8 +131,10 @@ export const useRoleStore = defineStore('role', {
     async fetchPermissions() {
       try {
         const res = await api.get('/roles/add'); // assuming your endpoint is /permissions
+        const json = JSON.stringify(res.data, null, 2);
+        console.log(json);
+
         this.permissions = res.data.data;
-        console.log(this.permissions);
       } catch (err: any) {
         this.error = err.response?.data?.message || 'Failed to fetch permissions';
       }
