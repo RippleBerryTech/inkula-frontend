@@ -37,6 +37,18 @@ const routes: RouteRecordRaw[] = [
         meta: { layout: 'auth' },
     },
     {
+        path: '/forgot-password-otp',
+        name: 'forgot-password-otp',
+        component: () => import('../views/auth/forgot-password-otp.vue'),
+        meta: { layout: 'auth' },
+    },
+    {
+        path: '/reset-password',
+        name: 'reset-password',
+        component: () => import('../views/auth/reset-password.vue'),
+        meta: { layout: 'auth' },
+    },
+    {
         path: '/roles',
         component: RouterView,                // wrapper that renders the children
         meta: { requiresAuth: true },

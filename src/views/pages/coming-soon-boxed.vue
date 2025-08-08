@@ -117,7 +117,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <p class="dark:text-white">© {{ new Date().getFullYear() }}. VRISTO All Rights Reserved.</p>
+                        <p class="dark:text-white">© {{ new Date().getFullYear() }}. Inkula All Rights Reserved.</p>
                     </div>
                 </div>
             </div>

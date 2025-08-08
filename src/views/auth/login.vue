@@ -97,7 +97,7 @@
                             </router-link>
                         </div>
                     </div>
-                    <p class="absolute bottom-6 w-full text-center dark:text-white">© {{ new Date().getFullYear() }}.VRISTO All Rights Reserved.</p>
+                    <p class="absolute bottom-6 w-full text-center dark:text-white">© {{ new Date().getFullYear() }}.Inkula All Rights Reserved.</p>
                 </div>
             </div>
         </div>
@@ -149,7 +149,11 @@ const submit = async () => {
             //reset validation
             $v.value.$reset()
             isSubmitForm.value = false
-            await appRouter.push('/otp');
+            if(auth.token != ''){
+                await appRouter.push('/');
+            } else {
+                await appRouter.push('/otp');
+            }
             //show success message
             toast.success(auth.message);
         } else {

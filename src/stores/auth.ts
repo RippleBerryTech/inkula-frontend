@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { defineStore } from 'pinia';
 import api from '../plugins/axios';
 
@@ -22,6 +23,12 @@ export const useAuthStore = defineStore('auth', {
                 if (res.data.success) {
                     this.message = res.data.message;
                     this.emailForOTP = res.data.data.user.email;
+                    if (res.data.data.token != null) {
+                        this.token = res.data.data.token;
+                        localStorage.setItem('token', this.token);
+                        // 👇 Fetch user info (sets user, roles, permissions in store)
+                        await this.fetchUser();
+                    }
                     return res.data.success;
                 } else {
                     this.error = res.data.message;
@@ -83,6 +90,58 @@ export const useAuthStore = defineStore('auth', {
             this.loading = true;
             try {
                 const res = await api.post('/auth/password-reset-otp', data);
+                if (res.data.success) {
+                    this.message = res.data.message;
+                    this.emailForOTP = data.email;
+                    return res.data.success;
+                } else {
+                    this.error = res.data.message;
+                    return res.data.success;
+                }
+            } catch (err: any) {
+                this.error = err.response?.data?.message || 'Something went wrong';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async validatePasswordResetOtp(data: { otp: string; email: string }) {
+            this.error = '';
+            this.loading = true;
+            try {
+                const res = await api.post('/auth/validate-password-reset-otp', data);
+                if (res.data.success) {
+                    this.message = res.data.message;
+                    localStorage.setItem('temp_token', res.data.data.token);
+                    return res.data.success;
+                } else {
+                    this.error = res.data.message;
+                    return res.data.success;
+                }
+            } catch (err: any) {
+                this.error = err.response?.data?.message || 'Something went wrong';
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async passwordReset(data: { password: string; confirm_password: string }) {
+            this.error = '';
+            this.loading = true;
+            try {
+                // call an api via fetch
+                const tempToken = localStorage.getItem('temp_token');
+                const url = import.meta.env.VITE_BACKEND_URL;
+                const res = await axios.post(
+                    `${url}/auth/new-password`, // replace with actual endpoint
+                    data,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${tempToken}`,
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
                 if (res.data.success) {
                     this.message = res.data.message;
                     return res.data.success;

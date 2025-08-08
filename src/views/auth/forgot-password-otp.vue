@@ -14,25 +14,24 @@
 
                     <div class="mx-auto w-full max-w-[440px]">
                         <div class="mb-10">
-                            <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Recover Password</h1>
-                            <p class="text-base font-bold leading-normal text-white-dark">Enter your email to recover your password</p>
+                            <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Verification code</h1>
+                            <p class="text-base font-bold leading-normal text-white-dark">Enter the verification code we just sent you on your email address.</p>
                         </div>
                         <form class="space-y-5" @submit.prevent="submit">
-                            <div :class="{ 'has-error': $v.form.email.$error, 'has-success': isSubmitForm && !$v.form.email.$error }">
-                                <label for="otp" class="dark:text-white">Email</label>
+                            <div :class="{ 'has-error': $v.form.otp.$error, 'has-success': isSubmitForm && !$v.form.otp.$error }">
+                                <label for="otp" class="dark:text-white">OTP</label>
                                 <div class="relative text-white-dark">
-                                    <input v-model="form.email" id="otp" type="email" placeholder="Enter OTP" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input v-model="form.otp" id="otp" type="text" placeholder="Enter OTP" class="form-input ps-10 placeholder:text-white-dark" />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
-                                       <IconMail :size="20" stroke-width="1.5" />
+                                       <IconAuth2fa :size="20" stroke-width="1.5" />
                                     </span>
                                 </div>
-                                <template v-if="isSubmitForm && !$v.form.email.$error">
+                                <template v-if="isSubmitForm && !$v.form.otp.$error">
                                     <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                                 </template>
-                                <template v-if="isSubmitForm && $v.form.email.$error">
-                                    <p v-for="error in $v.form.email.$errors" :key="error.$uid" class="text-danger mt-1">
-                                        <span v-if="error.$validator === 'required'">Email is required</span>
-                                        <span v-else-if="error.$validator === 'email'">Please enter a valid email</span>
+                                <template v-if="isSubmitForm && $v.form.otp.$error">
+                                    <p v-for="error in $v.form.otp.$errors" :key="error.$uid" class="text-danger mt-1">
+                                        <span v-if="error.$validator === 'required'">OTP is required</span>
                                     </p>
                                 </template>
                             </div>
@@ -63,22 +62,24 @@ import useVuelidate from '@vuelidate/core';
 import { reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 
-import { IconMail } from '@tabler/icons-vue';
-import { email as emailRule, required } from '@vuelidate/validators';
+import { IconAuth2fa } from '@tabler/icons-vue';
+import { minLength, required } from '@vuelidate/validators';
 
 useMeta({ title: 'Forgot Password' });
 const auth = useAuthStore();
 
 const form = reactive({
-    email: '',
+    otp: '',
+    email: auth.emailForOTP,
 })
 
 // Validation rules
 const rules = {
   form: {
-     email: { required, email: emailRule },
+    otp: { required, minLength: minLength(6) },
   },
 };
+
 
 const isSubmitForm = ref(false)
 const $v = useVuelidate(rules, { form })
@@ -90,14 +91,14 @@ const submit = async () => {
   await $v.value.$validate()
 
     if (!$v.value.$invalid) {
-        var res = await auth.forgotPassword(form)
+        var res = await auth.validatePasswordResetOtp(form)
         if (res) {
             //reset form
-            form.email = ''
+            form.otp = ''
             //reset validation
             $v.value.$reset()
             isSubmitForm.value = false
-            await appRouter.push('/forgot-password-otp');
+            await appRouter.push('/reset-password');
             //show success message
             toast.success(auth.message);
         } else {

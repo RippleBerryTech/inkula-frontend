@@ -14,25 +14,44 @@
 
                     <div class="mx-auto w-full max-w-[440px]">
                         <div class="mb-10">
-                            <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Recover Password</h1>
-                            <p class="text-base font-bold leading-normal text-white-dark">Enter your email to recover your password</p>
+                            <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Password Reset</h1>
+                            <p class="text-base font-bold leading-normal text-white-dark">Your new password must be different to previously used passwords</p>
                         </div>
                         <form class="space-y-5" @submit.prevent="submit">
-                            <div :class="{ 'has-error': $v.form.email.$error, 'has-success': isSubmitForm && !$v.form.email.$error }">
-                                <label for="otp" class="dark:text-white">Email</label>
+                            <div :class="{ 'has-error': $v.form.password.$error, 'has-success': isSubmitForm && !$v.form.password.$error }">
+                                <label for="password" class="dark:text-white">Password</label>
                                 <div class="relative text-white-dark">
-                                    <input v-model="form.email" id="otp" type="email" placeholder="Enter OTP" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input v-model="form.password" id="otp" type="password" placeholder="Enter Password" class="form-input ps-10 placeholder:text-white-dark" />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
                                        <IconMail :size="20" stroke-width="1.5" />
                                     </span>
                                 </div>
-                                <template v-if="isSubmitForm && !$v.form.email.$error">
+                                <template v-if="isSubmitForm && !$v.form.password.$error">
                                     <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                                 </template>
-                                <template v-if="isSubmitForm && $v.form.email.$error">
-                                    <p v-for="error in $v.form.email.$errors" :key="error.$uid" class="text-danger mt-1">
-                                        <span v-if="error.$validator === 'required'">Email is required</span>
-                                        <span v-else-if="error.$validator === 'email'">Please enter a valid email</span>
+                                <template v-if="isSubmitForm && $v.form.password.$error">
+                                    <p v-for="error in $v.form.password.$errors" :key="error.$uid" class="text-danger mt-1">
+                                        <span v-if="error.$validator === 'required'">password is required</span>
+                                        <span v-else-if="error.$validator === 'minLength'">password must be at least 6 characters</span>
+                                    </p>
+                                </template>
+                            </div>
+                            <div :class="{ 'has-error': $v.form.confirm_password.$error, 'has-success': isSubmitForm && !$v.form.confirm_password.$error }">
+                                <label for="confirm_password" class="dark:text-white">Confirm Password</label>
+                                <div class="relative text-white-dark">
+                                    <input v-model="form.confirm_password" id="confirm_password" type="password" placeholder="Enter confirm password" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <span class="absolute start-4 top-1/2 -translate-y-1/2">
+                                       <IconMail :size="20" stroke-width="1.5" />
+                                    </span>
+                                </div>
+                                <template v-if="isSubmitForm && !$v.form.confirm_password.$error">
+                                    <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                                </template>
+                                <template v-if="isSubmitForm && $v.form.confirm_password.$error">
+                                    <p v-for="error in $v.form.confirm_password.$errors" :key="error.$uid" class="text-danger mt-1">
+                                        <span v-if="error.$validator === 'required'">confirm password is required</span>
+                                        <span v-else-if="error.$validator === 'minLength'">confirm password must be at least 6 characters</span>
+                                        <span v-else-if="error.$validator === 'sameAsPassword'">confirm password must be same as password</span>
                                     </p>
                                 </template>
                             </div>
@@ -64,19 +83,21 @@ import { reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 
 import { IconMail } from '@tabler/icons-vue';
-import { email as emailRule, required } from '@vuelidate/validators';
+import { minLength, required } from '@vuelidate/validators';
 
 useMeta({ title: 'Forgot Password' });
 const auth = useAuthStore();
 
 const form = reactive({
-    email: '',
+    password: '',
+    confirm_password: '',
 })
 
 // Validation rules
 const rules = {
   form: {
-     email: { required, email: emailRule },
+    password : { required, minLength: minLength(6) },
+    confirm_password: { required, minLength: minLength(6), sameAsPassword: (value) => value === form.password },
   },
 };
 
@@ -90,14 +111,15 @@ const submit = async () => {
   await $v.value.$validate()
 
     if (!$v.value.$invalid) {
-        var res = await auth.forgotPassword(form)
+        var res = await auth.passwordReset(form)
         if (res) {
             //reset form
-            form.email = ''
+            form.password = ''
+            form.confirm_password = ''
             //reset validation
             $v.value.$reset()
             isSubmitForm.value = false
-            await appRouter.push('/forgot-password-otp');
+            await appRouter.push('/login');
             //show success message
             toast.success(auth.message);
         } else {
