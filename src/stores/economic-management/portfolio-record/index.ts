@@ -16,6 +16,9 @@ export const usePortfolioStore = defineStore('portfolio-record', {
     editPortfolioRecordError : '',
     deletePortfolioRecordError: '',
 
+    addPortfolioRecordFieldErrors: {} as Record<string, string[]>,
+    editPortfolioRecordFieldErrors: {} as Record<string, string[]>,
+
     /* NEW - cache flag */
     hasFetchedPortfolioRecords: false
   }),
@@ -44,21 +47,29 @@ export const usePortfolioStore = defineStore('portfolio-record', {
     // add portfolio record
     async addPortfolioRecord(data) {
       this.addPortfolioRecordError = '';
+      this.addPortfolioRecordFieldErrors = {};
       this.loading = true;
+
       try {
         const res = await api.post('/portfolio-records/store', data);
         if (res.data.success) {
           this.portfolioRecords.push(res.data.data.portfolioRecords);
-          return res.data.success;
+          return true;
         } else {
           this.addPortfolioRecordError = res.data.message;
-          return res.data.success;
+          if (res.data.errors) {
+            this.addPortfolioRecordFieldErrors = res.data.errors;
+          }
+          return false;
         }
       } catch (err: any) {
         this.addPortfolioRecordError = err.response?.data?.message || 'Failed to add portfolio record';
+        if (err.response?.data?.errors) {
+          this.addPortfolioRecordFieldErrors = err.response.data.errors;
+        }
         return false;
       } finally {
-            this.loading = false;
+        this.loading = false;
       }
     },
 
@@ -82,30 +93,36 @@ export const usePortfolioStore = defineStore('portfolio-record', {
       }
     },
 
-    // update portfolio record
     async updatePortfolioRecord(data) {
       this.editPortfolioRecordError = '';
+      this.editPortfolioRecordFieldErrors = {};
       this.loading = true;
+
       try {
         const res = await api.put(`/portfolio-records/update/${data.id}`, data);
-        console.log(res);
         if (res.data.success) {
-          this.portfolioRecords = this.portfolioRecords.map((role) => {
-            if (role.id === data.id) {
+          this.portfolioRecords = this.portfolioRecords.map((record) => {
+            if (record.id === data.id) {
               return res.data.data.portfolioRecord;
             }
-            return role;
+            return record;
           });
-          return res.data.success;
+          return true;
         } else {
           this.editPortfolioRecordError = res.data.message;
-          return res.data.success;
+          if (res.data.errors) {
+            this.editPortfolioRecordFieldErrors = res.data.errors;
+          }
+          return false;
         }
       } catch (err: any) {
         this.editPortfolioRecordError = err.response?.data?.message || 'Failed to update portfolio record';
+        if (err.response?.data?.errors) {
+          this.editPortfolioRecordFieldErrors = err.response.data.errors;
+        }
         return false;
       } finally {
-            this.loading = false;
+        this.loading = false;
       }
     },
 

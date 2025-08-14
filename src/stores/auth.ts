@@ -158,8 +158,6 @@ export const useAuthStore = defineStore('auth', {
 
         async logout() {
             this.loading = true;
-            // add sleep
-            await new Promise(resolve => setTimeout(resolve, 3000));
             try {
                 const res = await api.post('/auth/logout');
                 if (res.data.success) {
@@ -189,7 +187,6 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const res = await api.get('/user')
                 const { roles, permissions, ...userData } = res.data
-                console.log('Fetched user data:\n' + safeStringify(userData));
 
                 this.user = userData
                 this.roles = roles

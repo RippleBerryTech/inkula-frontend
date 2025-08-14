@@ -5,7 +5,7 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Add Role</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Add Economic Submission</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">

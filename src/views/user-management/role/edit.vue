@@ -73,6 +73,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import { appRouter } from '@/router';
 import Multiselect from '@suadelabs/vue3-multiselect';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
@@ -82,7 +83,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
 import { useRoleStore } from '../../../stores/user-management/role';
-import { appRouter } from '@/router';
 
 useMeta({ title: 'Edit Role' })
 
@@ -173,8 +173,7 @@ onMounted(async () => {
     form.id = role.id.toString()
     form.name = role.name
     form.description = role.description
-    form.permissions = role.permissions,
-    console.log('permissions', form.permissions)
+    form.permissions = role.permissions
   } else {
     await router.push('/roles/list')
     toast.error(roleStore.editRoleError || 'Role not found')

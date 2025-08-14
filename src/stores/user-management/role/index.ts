@@ -85,7 +85,6 @@ export const useRoleStore = defineStore('role', {
       this.loading = true;
       try {
         const res = await api.put(`/roles/update/${data.id}`, data);
-        console.log(res);
         if (res.data.success) {
           this.roles = this.roles.map((role) => {
             if (role.id === data.id) {
@@ -132,7 +131,6 @@ export const useRoleStore = defineStore('role', {
       try {
         const res = await api.get('/roles/add'); // assuming your endpoint is /permissions
         const json = JSON.stringify(res.data, null, 2);
-        console.log(json);
 
         this.permissions = res.data.data;
       } catch (err: any) {

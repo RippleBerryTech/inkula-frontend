@@ -108,7 +108,6 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
       this.loading = true;
       try {
         const res = await api.put(`/economic-submissions/update/${data.id}`, data);
-        console.log(res);
         if (res.data.success) {
           this.economicSubmissions = this.economicSubmissions.map((role) => {
             if (role.id === data.id) {

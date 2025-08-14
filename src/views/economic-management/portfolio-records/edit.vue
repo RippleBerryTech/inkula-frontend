@@ -10,33 +10,51 @@
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">
               <div class="flex flex-col md:flex-row gap-4">
-                <!-- Name -->
-                <div class="flex-1"
-                  :class="{ 'has-error': $v.form.name.$error, 'has-success': isSubmitForm && !$v.form.name.$error }">
+                                <!-- Name -->
+                <div class="flex-1" :class="{
+                  'has-error': $v.form.name.$error || backendErrors.name,
+                  'has-success': isSubmitForm && !$v.form.name.$error && !backendErrors.name
+                }">
                   <label for="name">Name</label>
-                  <input id="name" type="text" placeholder="Enter Name"
-                    class="form-input" v-model="form.name" />
-                  <template v-if="isSubmitForm && !$v.form.name.$error">
+                  <input id="name" type="text" placeholder="Enter Name" class="form-input" v-model="form.name" />
+
+                  <!-- Looks Good -->
+                  <template v-if="isSubmitForm && !$v.form.name.$error && !backendErrors.name">
                     <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                   </template>
+
+                  <!-- Frontend errors -->
                   <template v-if="isSubmitForm && $v.form.name.$error">
-                    <p v-for="error in $v.form.name.$errors" :key="error.$uid"
-                      class="text-danger mt-1">
+                    <p v-for="error in $v.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
                       <span v-if="error.$validator === 'required'">Name is required</span>
                     </p>
                   </template>
-                </div>
 
-                <div class="flex-1"
-                  :class="{ 'has-error': $v.form.website.$error, 'has-success': isSubmitForm && !$v.form.website.$error }">
-                  <label for="website">Website</label>
-                  <input id="website" type="text" placeholder="Enter website"
-                    class="form-input" v-model="form.website" />
-                  <template v-if="isSubmitForm && !$v.form.website.$error">
-                    <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                  <!-- Backend error -->
+                  <template v-if="backendErrors.name">
+                    <p class="text-danger mt-1">{{ backendErrors.name }}</p>
                   </template>
                 </div>
 
+                <!-- Website -->
+                <div class="flex-1" :class="{
+                  'has-error': $v.form.website.$error || backendErrors.website,
+                  'has-success': isSubmitForm && !$v.form.website.$error && !backendErrors.website
+                }">
+                  <label for="website">Website</label>
+                  <input id="website" type="text" placeholder="Enter website" class="form-input"
+                    v-model="form.website" />
+
+                  <!-- Looks Good -->
+                  <template v-if="isSubmitForm && !$v.form.website.$error && !backendErrors.website">
+                    <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                  </template>
+
+                  <!-- Backend error -->
+                  <template v-if="backendErrors.website">
+                    <p class="text-danger mt-1">{{ backendErrors.website }}</p>
+                  </template>
+                </div>
               </div>
 
 
@@ -88,6 +106,11 @@ const form = reactive({
   website: '',
 })
 
+const backendErrors = reactive({
+  name: '',
+  website: ''
+});
+
 // Validation rules
 const rules = {
   form: {
@@ -103,28 +126,29 @@ const $v = useVuelidate(rules, { form })
 // Form submit handler
 
 const submitForm = async () => {
-  isSubmitForm.value = true
-  await $v.value.$validate()
+  isSubmitForm.value = true;
+  Object.keys(backendErrors).forEach(k => backendErrors[k] = ''); // reset backend errors
+
+  await $v.value.$validate();
 
   if (!$v.value.$invalid) {
-
     const ok = await portfolioStore.updatePortfolioRecord({
-    id: Number(form.id),
-    name: form.name,
-    website: form.website
-  })
+      id: Number(form.id),
+      name: form.name,
+      website: form.website
+    });
 
-  if (ok) {
-    await appRouter.push('/economic-management/portfolio-records/list')
-    toast.success('Portfolio Record updated successfully')
-  } else {
-    toast.error(portfolioStore.editPortfolioRecordError)
+    if (ok === true) {
+      toast.success('Portfolio Record updated successfully');
+      await appRouter.push('/economic-management/portfolio-records/list');
+    } else {
+      // Map backend field errors
+      for (const field in portfolioStore.editPortfolioRecordFieldErrors) {
+        backendErrors[field] = portfolioStore.editPortfolioRecordFieldErrors[field][0];
+      }
+    }
   }
-
-  } else {
-    toast.error('Validation Failed')
-  }
-}
+};
 
 const portfolioStore = usePortfolioStore();
 

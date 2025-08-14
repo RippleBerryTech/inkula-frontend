@@ -392,7 +392,6 @@
             },
         }).then((result) =&gt; {
             if (result.dismiss === Swal.DismissReason.timer) {
-                console.log('I was closed by the timer');
             }
         });
     }
@@ -938,7 +937,6 @@ import IconCode from '@/components/icon/icon-code.vue';
                 },
             }).then((result) => {
                 if (result.dismiss === Swal.DismissReason.timer) {
-                    console.log('I was closed by the timer');
                 }
             });
         } else if (type === 8) {
