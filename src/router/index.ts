@@ -94,6 +94,75 @@ const routes: RouteRecordRaw[] = [
             },
         ],
     },
+    {
+        path: '/economic-management/economic-submissions',
+        component: RouterView,                // wrapper that renders the children
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'list',
+                name: 'economic-submissions-list',
+                component: () => import('../../src/views/economic-management/economic-submissions/index.vue'),
+            },
+            {
+                path: 'add',
+                name: 'economic-submission-add',
+                component: () => import('../../src/views/economic-management/economic-submissions/add.vue'),
+            },
+            {
+                path: ':id/edit',
+                name: 'economic-submission-edit',
+                props: true,
+                component: () => import('../../src/views/economic-management/economic-submissions/edit.vue'),
+            },
+        ],
+    },
+    {
+        path: '/economic-management/sectors',
+        component: RouterView,                // wrapper that renders the children
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'list',
+                name: 'sectors-list',
+                component: () => import('../../src/views/economic-management/sectors/index.vue'),
+            },
+            {
+                path: 'add',
+                name: 'sector-add',
+                component: () => import('../../src/views/economic-management/sectors/add.vue'),
+            },
+            {
+                path: ':id/edit',
+                name: 'sector-edit',
+                props: true,
+                component: () => import('../../src/views/economic-management/sectors/edit.vue'),
+            },
+        ],
+    },
+    {
+        path: '/economic-management/portfolio-records',
+        component: RouterView,                // wrapper that renders the children
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'list',
+                name: 'portfolio-records-list',
+                component: () => import('../../src/views/economic-management/portfolio-records/index.vue'),
+            },
+            {
+                path: 'add',
+                name: 'portfolio-record-add',
+                component: () => import('../../src/views/economic-management/portfolio-records/add.vue'),
+            },
+            {
+                path: ':id/edit',
+                name: 'portfolio-record-edit',
+                props: true,
+                component: () => import('../../src/views/economic-management/portfolio-records/edit.vue'),
+            },
+        ],
+    },
     // optional fallback
     {
         path: '/:catchAll(.*)',

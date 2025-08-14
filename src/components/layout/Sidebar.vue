@@ -74,6 +74,57 @@
                                 </li>
                             </ul>
                         </li>
+                        <h2 v-if="hasPermission('View Economic Submission') || hasPermission('View Portfolio Record') || hasPermission('View Sector')" class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
+                            <svg
+                                class="w-4 h-5 flex-none hidden"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                fill="none"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            <span>ECONOMIC MANAGEMENT</span>
+                        </h2>
+
+                        <li v-if="hasPermission('View Economic Submission') || hasPermission('View Portfolio Record') || hasPermission('View Sector')" class="nav-item">
+                            <ul>
+                                <li v-if="hasPermission('View Economic Submission')" class="nav-item">
+                                    <router-link to="/economic-management/economic-submissions/list" class="group" @click="toggleMobileMenu" :class="{ active: isEconomicSubmissionSection }">
+                                        <div class="flex items-center">
+                                            <IconFileDollar :size="20" stroke-width="1.5" />
+                                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                                Economic Submissions
+                                            </span>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li v-if="hasPermission('View Portfolio Record')" class="nav-item">
+                                    <router-link to="/economic-management/portfolio-records/list" class="group" @click="toggleMobileMenu" :class="{ active: isPortfolioRecordSection }">
+                                        <div class="flex items-center">
+                                            <IconBriefcase :size="20" stroke-width="1.5" />
+
+                                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                                Portfolio Records
+                                            </span>
+                                        </div>
+                                    </router-link>
+                                </li>
+                                <li v-if="hasPermission('View Sector')" class="nav-item">
+                                    <router-link to="/economic-management/sectors/list" class="group" @click="toggleMobileMenu" :class="{ active: isSectorSection }">
+                                        <div class="flex items-center">
+                                            <IconBuildingSkyscraper :size="20" stroke-width="1.5" />
+
+                                            <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
+                                                Sectors
+                                            </span>
+                                        </div>
+                                    </router-link>
+                                </li>
+                            </ul>
+                        </li>
 
                         <!-- <h2 class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                             <svg
@@ -956,7 +1007,7 @@
     import { onMounted, ref } from 'vue';
 
     import { usePermissions } from '@/composables/usePermissions';
-import { IconChevronsLeft, IconHome2, IconLock, IconUsersGroup } from '@tabler/icons-vue';
+import { IconBriefcase, IconBuildingSkyscraper, IconChevronsLeft, IconFileDollar, IconHome2, IconLock, IconUsersGroup } from '@tabler/icons-vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppStore } from '../../stores/index';
@@ -968,6 +1019,9 @@ const { hasRole, hasPermission } = usePermissions()
     // true whenever the path begins with "/roles"
     const isRolesSection = computed(() => route.path.startsWith('/roles'))
     const isUsersSection = computed(() => route.path.startsWith('/users'))
+    const isEconomicSubmissionSection = computed(() => route.path.startsWith('/economic-management/economic-submissions'))
+    const isSectorSection = computed(() => route.path.startsWith('/economic-management/sectors'))
+    const isPortfolioRecordSection = computed(() => route.path.startsWith('/economic-management/portfolio-records'))
 
 
     const store = useAppStore();
