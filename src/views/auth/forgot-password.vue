@@ -21,7 +21,7 @@
                             <div :class="{ 'has-error': $v.form.email.$error, 'has-success': isSubmitForm && !$v.form.email.$error }">
                                 <label for="otp" class="dark:text-white">Email</label>
                                 <div class="relative text-white-dark">
-                                    <input v-model="form.email" id="otp" type="email" placeholder="Enter OTP" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input v-model="form.email" id="otp" type="email" placeholder="Enter Email" class="form-input ps-10 placeholder:text-white-dark" />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
                                        <IconMail :size="20" stroke-width="1.5" />
                                     </span>

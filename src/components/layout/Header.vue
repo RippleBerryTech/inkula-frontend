@@ -6,7 +6,7 @@
                     <router-link to="/" class="main-logo flex items-center shrink-0">
                         <img class="w-8 ltr:-ml-1 rtl:-mr-1 inline" src="/assets/images/logo.svg" alt="" />
                         <span
-                            class="text-2xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle hidden md:inline dark:text-white-light transition-all duration-300">Akula</span>
+                            class="text-2xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle hidden md:inline dark:text-white-light transition-all duration-300">Inkula</span>
                     </router-link>
 
                     <a href="javascript:;"
@@ -192,28 +192,28 @@
                                             </div>
                                             <div class="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 class="text-base">
-                                                    John Doe<span
-                                                        class="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
+                                                    {{ auth.user ? auth.user.name : '' }}
+                                                    <!-- <span class="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span> -->
                                                 </h4>
                                                 <a class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white"
-                                                    href="javascript:;">johndoe@gmail.com</a>
+                                                    href="javascript:;">{{ auth.user ? auth.user.user.email : '' }}</a>
                                             </div>
                                         </div>
                                     </li>
-                                    <li>
+                                    <!-- <li>
                                         <router-link to="/users/profile" class="dark:hover:text-white" @click="close()">
                                             <IconUser class="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" :size="20"
                                                 stroke-width="1.5" />
 
                                             Profile
                                         </router-link>
-                                    </li>
+                                    </li> -->
                                     <li class="border-t border-white-light dark:border-white-light/10">
-                                        <a href="javascript:;" class="text-danger !py-3" @click.prevent="logout">
+                                        <a href="javascript:;" class="text-danger !py-3" @click.prevent="logout" :disabled="auth.loading">
                                             <IconLogout class="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" :size="20"
-                                                stroke-width="1.5" />
-
-                                            Sign Out
+                                            stroke-width="1.5" />
+                                            {{ auth.loading ? 'Signing out...' : 'Sign out' }}
+                                            <span v-if="auth.loading" class="loader border-danger border-2 border-t-transparent w-5 h-5 rounded-full animate-spin mx-3"></span>
                                         </a>
                                     </li>
                                 </ul>

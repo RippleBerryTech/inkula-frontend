@@ -48,7 +48,7 @@
         </div>
 
         <!-- BEGIN APP SETTING LAUNCHER -->
-        <Setting />
+        <!-- <Setting /> -->
         <!-- END APP SETTING LAUNCHER -->
 
         <div class="main-container text-black dark:text-white-dark min-h-screen" :class="[store.navbar]">
@@ -75,11 +75,11 @@
     </div>
 </template>
 <script setup lang="ts">
-    import { ref, onMounted } from 'vue';
-    import Sidebar from '@/components/layout/Sidebar.vue';
-    import Header from '@/components/layout/Header.vue';
     import Footer from '@/components/layout/Footer.vue';
-    import Setting from '@/components/ThemeCustomizer.vue';
+import Header from '@/components/layout/Header.vue';
+import Sidebar from '@/components/layout/Sidebar.vue';
+import { onMounted, ref } from 'vue';
+    // import Setting from '@/components/ThemeCustomizer.vue';
     import appSetting from '@/app-setting';
 
     import { useAppStore } from '@/stores/index';

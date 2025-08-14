@@ -7,32 +7,34 @@ export const useUserStore = defineStore('user', {
     roles: [] as Array<{ id: number; name: string }>,
     loading: false,
     error: '',
-    addUserError : '',
+    addUserError: '',
     updateUserError: '',
     deleteUserError: '',
+    addUserFieldErrors: {} as Record<string, string[]>,
+    editUserFieldErrors: {} as Record<string, string[]>,
 
-     /* NEW - cache flag */
+    /* NEW - cache flag */
     hasFetchedRoles: false
   }),
 
   actions: {
     async fetchUsers(force = false) {
-       if (this.hasFetchedRoles && !force) return
+      if (this.hasFetchedRoles && !force) return
       this.loading = true;
       this.error = '';
 
       try {
         const res = await api.get('/users/list'); // assuming your endpoint is /users
         this.users = res.data.data;
-        this.hasFetchedRoles = true     
+        this.hasFetchedRoles = true
       } catch (err: any) {
         if (err.response?.status === 401) {
-            this.error = 'You are not authorized to view users.';
+          this.error = 'You are not authorized to view users.';
         } else {
-            this.error = err.response?.data?.message || 'Failed to fetch users';
+          this.error = err.response?.data?.message || 'Failed to fetch users';
         }
       } finally {
-            this.loading = false;
+        this.loading = false;
       }
     },
 
@@ -48,6 +50,7 @@ export const useUserStore = defineStore('user', {
     // add user
     async addUser(data) {
       this.addUserError = '';
+      this.addUserFieldErrors = {}; // new
       this.loading = true;
       try {
         const res = await api.post('/users/store', data);
@@ -56,10 +59,12 @@ export const useUserStore = defineStore('user', {
           return res.data.success;
         } else {
           this.addUserError = res.data.message;
+          this.addUserFieldErrors = res.data.errors || {}; // store field errors
           return res.data.success;
         }
       } catch (err: any) {
         this.addUserError = err.response?.data?.message || 'Failed to add user';
+        this.addUserFieldErrors = err.response?.data?.errors || {};
         return false;
       } finally {
             this.loading = false;
@@ -82,17 +87,18 @@ export const useUserStore = defineStore('user', {
         this.updateUserError = err.response?.data?.message || 'Failed to edit user';
         return false;
       } finally {
-            this.loading = false;
+        this.loading = false;
       }
     },
 
     // update user
     async updateUser(data) {
       this.updateUserError = '';
+       this.editUserFieldErrors = {}; // new
       this.loading = true;
       try {
         var res = await api.put(`/users/update/${data.id}`, data);
-        
+
         if (res.data.success) {
           this.users = this.users.map((user) => {
             if (user.id == data.id) {
@@ -102,14 +108,16 @@ export const useUserStore = defineStore('user', {
           });
           return res.data.success;
         } else {
+          this.editUserFieldErrors = res.data.errors || {}; // store field errors
           this.updateUserError = res.data.message;
           return res.data.success;
         }
       } catch (err: any) {
         this.updateUserError = err.response?.data?.message || 'Failed to update user';
+        this.addUserFieldErrors = err.response?.data?.errors || {};
         return false;
       } finally {
-            this.loading = false;
+        this.loading = false;
       }
     },
 
@@ -131,7 +139,7 @@ export const useUserStore = defineStore('user', {
         this.deleteUserError = err.response?.data?.message || 'Failed to delete role';
         return false;
       } finally {
-            this.loading = false;
+        this.loading = false;
       }
     },
   },

@@ -12,5 +12,5 @@ export const usePageTitle = (pageTitle: any) =>
     );
 
 export const useMeta = (data: any) => {
-    return useHead({ ...data, title: `${data.title} | Akula Analytics` });
+    return useHead({ ...data, title: `${data.title} | Inkula Analytics` });
 };

@@ -5,7 +5,7 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Add Role</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Add Sector</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">
@@ -31,7 +31,7 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-management/economic-submissions/list" class="group">
+                <router-link to="/economic-management/sectors/list" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 

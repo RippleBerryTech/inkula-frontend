@@ -157,6 +157,9 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async logout() {
+            this.loading = true;
+            // add sleep
+            await new Promise(resolve => setTimeout(resolve, 3000));
             try {
                 const res = await api.post('/auth/logout');
                 if (res.data.success) {
@@ -174,6 +177,8 @@ export const useAuthStore = defineStore('auth', {
             } catch (err: any) {
                 this.error = err.response?.data?.message || 'Something went wrong';
                 return false;
+            } finally {
+                this.loading = false;
             }
         },
 
@@ -184,6 +189,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const res = await api.get('/user')
                 const { roles, permissions, ...userData } = res.data
+                console.log('Fetched user data:\n' + safeStringify(userData));
 
                 this.user = userData
                 this.roles = roles
@@ -202,3 +208,15 @@ export const useAuthStore = defineStore('auth', {
 
     },
 });
+
+
+function safeStringify(obj, space = 2) {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) return '[Circular]';
+      seen.add(value);
+    }
+    return value;
+  }, space);
+}

@@ -7,7 +7,7 @@
             class="relative flex min-h-screen items-center justify-center bg-[url(/assets/images/auth/map.png)] bg-cover bg-center bg-no-repeat px-6 py-10 dark:bg-[#060818] sm:px-16"
         >
             <div
-                class="relative flex w-full max-w-[1502px] flex-col justify-between overflow-hidden rounded-md bg-white/60 backdrop-blur-lg dark:bg-black/50 lg:min-h-[758px] lg:flex-row lg:gap-10 xl:gap-0"
+                class="relative flex w-full max-w-[1502px] flex-col justify-between overflow-hidden rounded-md bg-white/60 backdrop-blur-lg dark:bg-black/50 lg:min-h-[658px] lg:flex-row lg:gap-10 xl:gap-0"
             >
                 <div
                     class="relative hidden w-full items-center justify-center bg-primary p-5 lg:inline-flex lg:max-w-[835px] xl:-ms-28 ltr:xl:skew-x-[14deg] rtl:xl:skew-x-[-14deg]"
@@ -151,11 +151,11 @@ const submit = async () => {
             isSubmitForm.value = false
             if(auth.token != ''){
                 await appRouter.push('/');
+                toast.success("Login Successfully");
             } else {
                 await appRouter.push('/otp');
+                toast.success(auth.message);
             }
-            //show success message
-            toast.success(auth.message);
         } else {
             toast.error(auth.error);
         }

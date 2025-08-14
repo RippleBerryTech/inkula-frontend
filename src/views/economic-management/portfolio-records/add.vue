@@ -41,7 +41,7 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-management/economic-submissions/list" class="group">
+                <router-link to="/economic-management/portfolio-records/list" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
