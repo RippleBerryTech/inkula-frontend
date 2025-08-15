@@ -15,6 +15,7 @@ export const useSectorStore = defineStore('sector', {
     editSectorError : '',
     deleteSectorError: '',
 
+    importErrors: [] as Array<{ row: number; attribute: string; errors: string[] }>,
     /* NEW - cache flag */
     hasFetchedSectors: false
   }),
@@ -126,6 +127,36 @@ export const useSectorStore = defineStore('sector', {
         return false;
       } finally {
             this.loading = false;
+      }
+    },
+    async importSectors(file: FormData) {
+      this.loading = true;
+      this.error = '';
+      this.importErrors = []; // Clear previous errors
+      try {
+        const res = await api.post('/sectors/import', file, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log(JSON.stringify(res.data, null, 2));
+        if (res.data.success) {
+          //clear previous sectors
+          this.sectors = [];
+          //set new sectors
+          this.sectors = res.data.data.sectors;
+          return res.data.success;
+        } else {
+          this.error = res.data.message;
+          this.importErrors = res.data.errors || []; // Store errors
+          return false;
+        }
+      } catch (err: any) {
+        this.error = err.response?.data?.message || 'Failed to import sectors';
+        this.importErrors = err.response?.data?.errors || [];
+        return false;
+      } finally {
+        this.loading = false;
       }
     },
   },

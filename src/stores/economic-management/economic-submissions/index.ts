@@ -36,6 +36,8 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
     editEconomicSubmissionError : '',
     deleteEconomicSubmissionError: '',
 
+    importErrors: [] as Array<{ row: number; attribute: string; errors: string[] }>,
+
     /* NEW - cache flag */
     hasFetchedEconomicSubmissions: false
   }),
@@ -146,6 +148,36 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
         return false;
       } finally {
             this.loading = false;
+      }
+    },
+
+    async importEconomicSubmissions(file: FormData) {
+      this.loading = true;
+      this.error = '';
+      this.importErrors = []; // Clear previous errors
+      try {
+        const res = await api.post('/economic-submissions/import', file, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log(JSON.stringify(res.data, null, 2));
+        if (res.data.success) {
+          // clear previous records and set new ones
+          this.economicSubmissions = [];
+          this.economicSubmissions = res.data.data.economicSubmissions;
+          return res.data.success;
+        } else {
+          this.error = res.data.message;
+          this.importErrors = res.data.errors || []; // Store errors
+          return false;
+        }
+      } catch (err: any) {
+        this.error = err.response?.data?.message || 'Failed to import portfolio records';
+        this.importErrors = err.response?.data?.errors || [];
+        return false;
+      } finally {
+        this.loading = false;
       }
     },
   },

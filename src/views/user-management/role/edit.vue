@@ -37,7 +37,7 @@
                 :class="{ 'has-error': $v.form.permissions.$error, 'has-success': isSubmitForm && !$v.form.permissions.$error }">
                 <label for="permissions">Permissions</label>
                 <multiselect v-model="form.permissions" :options="permissionOptions" :multiple="true" label="name"
-                  track-by="id" :reduce="p => p.name" :searchable="false" placeholder="Select permissions" />
+                  track-by="id" :reduce="p => p.name" :searchable="false" placeholder="Select permissions" :close-on-select="false"/>
                 <template v-if="isSubmitForm && !$v.form.permissions.$error">
                   <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                 </template>

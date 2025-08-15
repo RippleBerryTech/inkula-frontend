@@ -7,7 +7,13 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link to="/economic-management/economic-submissions/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add Economic Submission</router-link>
+                <div>
+                    <button class="btn btn-primary" v-if="hasPermission('Add Economic Submission')" type="button"
+                        v-tippy="'Import Economic Submission'" @click="importEconomicSubmissionModal = true;">
+                        Import via CSV
+                    </button>
+                </div>
+                <router-link v-tippy="'Add Economic Submission'" to="/economic-management/economic-submissions/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add Economic Submission</router-link>
             </div>
 
             <div class="datatable">
@@ -67,7 +73,7 @@
                                 </router-link>
                             </div>
                             <div>
-                                <button v-if="hasPermission('Delete Economic Submission')" type="button" v-tippy:delete>
+                                <button v-if="hasPermission('Delete Economic Submission')" type="button" v-tippy="'Delete'">
                                     <IconTrash :size="20" stroke-width="1.5"  @click="deleteEconomicSubmissionModal = true; selectEconomicSubmissionId = data.value.id"/>
                                 </button>
                             </div>
@@ -119,6 +125,59 @@
         </Dialog>
     </TransitionRoot>
 
+    <!-- Import Portfolio Record Modal -->
+    <TransitionRoot appear :show="importEconomicSubmissionModal" as="template">
+        <Dialog as="div" @close="closeModal" class="relative z-[51]">
+            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+                leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+                <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 overflow-y-auto">
+                <div class="flex min-h-full items-start justify-center px-4 py-8">
+                    <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95">
+                        <DialogPanel
+                            class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+                            <button type="button"
+                                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                                @click="closeModal">
+                                <IconX :size="20" stroke-width="1.5" />
+                            </button>
+                            <div
+                                class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                                Select File to Import Sectors Data
+                            </div>
+                            <div class="p-5" v-if="importEconomicSubmissionModal">
+                                <FileUpload ref="fileUploadRef" :show="importEconomicSubmissionModal"
+                                    @file-selected="handleFileSelected" />
+
+                                <!-- Error List -->
+                                <div v-if="economicStore.importErrors.length > 0" class="mt-4">
+                                    <p class="text-danger font-semibold">Import Errors:</p>
+                                    <ul class="list-disc list-inside text-danger">
+                                        <li v-for="error in economicStore.importErrors" :key="error.row">
+                                            Row {{ error.row }}: {{ error.errors.join(', ') }}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="flex justify-end items-center mt-8">
+                                    <button type="button" @click="closeModal"
+                                        class="btn btn-outline-danger">Cancel</button>
+                                    <button type="button" @click="importSector"
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="economicStore.loading">
+                                        {{ economicStore.loading ? 'Importing...' : 'Import' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
 
 </template>
 <script setup lang="ts">
@@ -176,6 +235,50 @@ const deleteEconomicSubmission = async () => {
     }
 
 }
+
+
+
+import FileUpload from '../../components/file-upload.vue';
+const importEconomicSubmissionModal = ref(false);
+
+// Import function
+const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
+const selectedFile = ref<File | null>(null);
+
+
+const handleFileSelected = (file: File) => {
+    selectedFile.value = file;
+    economicStore.importErrors = []; // Clear errors when a new file is selected
+};
+
+const importSector = async () => {
+    if (!selectedFile.value) {
+        toast.error('Please select a file first!');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile.value);
+
+    const res = await economicStore.importEconomicSubmissions(formData);
+
+    if (res) {
+        toast.success('Sectors imported successfully');
+        importEconomicSubmissionModal.value = false;
+        fileUploadRef.value?.clearPreview();
+        selectedFile.value = null;
+        economicStore.importErrors = []; // Clear errors on success
+    } else {
+        toast.error(economicStore.error || 'Failed to import economic submissions');
+        // Errors are already stored in sectorStore.importErrors
+    }
+};
+
+const closeModal = () => {
+    importEconomicSubmissionModal.value = false;
+    economicStore.importErrors = []; // Clear errors when closing modal
+    selectedFile.value = null; // Clear selected file
+};
 
 </script>
 

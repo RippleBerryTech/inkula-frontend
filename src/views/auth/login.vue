@@ -114,7 +114,7 @@ import { useMeta } from '../../composables/use-meta';
 import { useAuthStore } from '../../stores/auth';
 
 
-useMeta({ title: 'Register' });
+useMeta({ title: 'Login' });
 const form = reactive({
     email: '',
     password: '',
