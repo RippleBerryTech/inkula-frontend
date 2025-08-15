@@ -194,6 +194,7 @@ import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useEconomicSubmissionStore } from '../../../stores/economic-management/economic-submissions/index';
+import FileUpload from '../../components/file-upload.vue';
 
 const { hasRole, hasPermission } = usePermissions()
 
@@ -238,7 +239,6 @@ const deleteEconomicSubmission = async () => {
 
 
 
-import FileUpload from '../../components/file-upload.vue';
 const importEconomicSubmissionModal = ref(false);
 
 // Import function

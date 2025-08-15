@@ -169,6 +169,7 @@ import { usePermissions } from '@/composables/usePermissions';
 import { usePortfolioStore } from '@/stores/economic-management/portfolio-record';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
+import FileUpload from '../../components/file-upload.vue';
 
 const { hasRole, hasPermission } = usePermissions()
 
@@ -207,7 +208,6 @@ const deletePortfolioRecord = async () => {
 }
 
 
-import FileUpload from '../../components/file-upload.vue';
 const importPortfolioRecordModal = ref(false);
 
 // Import function
