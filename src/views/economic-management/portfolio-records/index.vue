@@ -10,10 +10,10 @@
                 <div>
                     <button class="btn btn-primary" v-if="hasPermission('Add Portfolio Record')" type="button"
                         v-tippy="'Import Portfolio Records'" @click="importPortfolioRecordModal = true;">
-                        Import via CSV
+                        Import
                     </button>
                 </div>
-                <router-link to="/economic-management/portfolio-records/add" v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary">Add Portfolio Record</router-link>
+                <router-link to="/economic-management/portfolio-records/add" v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary">Add</router-link>
             </div>
 
             <div class="datatable">

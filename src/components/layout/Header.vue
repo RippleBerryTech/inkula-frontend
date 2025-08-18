@@ -177,9 +177,8 @@
                     <div class="dropdown shrink-0">
                         <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'" offsetDistance="8"
                             class="!block">
-                            <button type="button" class="relative group block">
-                                <img class="w-9 h-9 rounded-full object-cover saturate-50 group-hover:saturate-100"
-                                    src="/assets/images/user-profile.jpeg" alt="" />
+                            <button type="button" class="relative group block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
+                                <IconUser :size="20" stroke-width="1.5" />
                             </button>
                             <template #content="{ close }">
                                 <ul
@@ -187,8 +186,9 @@
                                     <li>
                                         <div class="flex items-center px-4 py-4">
                                             <div class="flex-none">
-                                                <img class="rounded-md w-10 h-10 object-cover"
-                                                    src="/assets/images/user-profile.jpeg" alt="" />
+                                                <button type="button" class="relative group block p-2 rounded-full bg-white-light/40 dark:bg-dark/40">
+                                                    <IconUser :size="20" stroke-width="1.5" />
+                                                </button>
                                             </div>
                                             <div class="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 class="text-base">
@@ -746,7 +746,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 
-import { IconBell, IconDeviceLaptop, IconLogout, IconMoon, IconSun, IconUser } from '@tabler/icons-vue';
+import { IconBell, IconLogout, IconUser } from '@tabler/icons-vue';
 
 
 import { useAppStore } from '@/stores/index';
@@ -756,7 +756,6 @@ import IconCaretDown from '@/components/icon/icon-caret-down.vue';
 import IconInfoCircle from '@/components/icon/icon-info-circle.vue';
 // import IconMail from '@/components/icon/icon-mail.vue';
 import IconMenu from '@/components/icon/icon-menu.vue';
-import IconXCircle from '@/components/icon/icon-x-circle.vue';
 import IconMenuApps from '@/components/icon/menu/icon-menu-apps.vue';
 import IconMenuComponents from '@/components/icon/menu/icon-menu-components.vue';
 import IconMenuDashboard from '@/components/icon/menu/icon-menu-dashboard.vue';

@@ -10,10 +10,10 @@
                 <div>
                     <button class="btn btn-primary" v-if="hasPermission('Add Economic Submission')" type="button"
                         v-tippy="'Import Economic Submission'" @click="importEconomicSubmissionModal = true;">
-                        Import via CSV
+                        Import
                     </button>
                 </div>
-                <router-link v-tippy="'Add Economic Submission'" to="/economic-management/economic-submissions/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add Economic Submission</router-link>
+                <router-link v-tippy="'Add Economic Submission'" to="/economic-management/economic-submissions/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add</router-link>
             </div>
 
             <div class="datatable">

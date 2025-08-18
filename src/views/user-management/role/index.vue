@@ -7,7 +7,7 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link to="/roles/add" v-if="hasPermission('Add Role')" class="btn btn-primary">Add Role</router-link>
+                <router-link to="/roles/add" v-if="hasPermission('Add Role')" class="btn btn-primary">Add</router-link>
             </div>
 
             <div class="datatable">

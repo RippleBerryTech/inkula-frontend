@@ -10,11 +10,11 @@
                 <div>
                     <button class="btn btn-primary" v-if="hasPermission('Add Sector')" type="button"
                         v-tippy="'Import Sectors'" @click="importSectorModal = true;">
-                        Import via CSV
+                        Import
                     </button>
                 </div>
                 <router-link to="/economic-management/sectors/add" v-if="hasPermission('Add Sector')"
-                    class="btn btn-primary" v-tippy="'Add Sector'">Add Sector</router-link>
+                    class="btn btn-primary" v-tippy="'Add Sector'">Add</router-link>
             </div>
 
             <div class="datatable">
