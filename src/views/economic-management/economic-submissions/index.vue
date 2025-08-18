@@ -17,8 +17,14 @@
             </div>
 
             <div class="datatable">
-                <div v-if="economicStore.loading">Loading data...</div>
-                <vue3-datatable :rows="economicStore.economicSubmissions" :columns="columns" :totalRows="economicStore.economicSubmissions?.length"
+                <!-- Loading Spinner -->
+                <Loader v-if="economicStore.loading" size="64" color="#4361ee" />
+                <!-- Error -->
+                <div v-else-if="economicStore.error" class="text-red-500 text-center py-4">
+                    {{ economicStore.error }}
+                </div>
+                <!-- DataTable -->
+                <vue3-datatable v-else :rows="economicStore.economicSubmissions" :columns="columns" :totalRows="economicStore.economicSubmissions?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
                     firstArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 17h6l-4 -5l4 -5h-6l-4 5z" /></svg>' 
                     lastArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-6l4 5l-4 5h6l4 -5z" /></svg>' 
@@ -66,6 +72,12 @@
                     </template>
                     <template #action="data">
                         <div class="flex items-center">
+                            <div>
+                                <router-link v-if="hasPermission('View Economic Submission')" :to="{ name: 'economic-submission-show', params: { id: data.value.id } }"
+                                    class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'View Details'">
+                                    <IconEye :size="20" stroke-width="1.5" />
+                                </router-link>
+                            </div>
                             <div>
                                 <router-link v-if="hasPermission('Edit Economic Submission')" :to="{ name: 'economic-submission-edit', params: { id: data.value.id } }"
                                     class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
@@ -147,7 +159,7 @@
                             </button>
                             <div
                                 class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Import Sectors Data
+                                Select File to Economic Submissions Data
                             </div>
                             <div class="p-5" v-if="importEconomicSubmissionModal">
                                 <FileUpload ref="fileUploadRef" :show="importEconomicSubmissionModal"
@@ -165,7 +177,11 @@
 
                                 <div class="flex justify-end items-center mt-8">
                                     <button type="button" @click="closeModal"
-                                        class="btn btn-outline-danger">Cancel</button>
+                                        class="btn btn-outline-danger">Back</button>
+                                    <button type="button" @click="downloadTemplate"
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="economicStore.loading">
+                                        {{ economicStore.loading ? 'Downloading...' : 'Download Template' }}
+                                    </button>
                                     <button type="button" @click="importSector"
                                         class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="economicStore.loading">
                                         {{ economicStore.loading ? 'Importing...' : 'Import' }}
@@ -183,7 +199,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -196,6 +212,7 @@ import { toast } from 'vue3-toastify';
 import { useEconomicSubmissionStore } from '../../../stores/economic-management/economic-submissions/index';
 import FileUpload from '../../components/file-upload.vue';
 
+import Loader from '../../components/loader.vue';
 const { hasRole, hasPermission } = usePermissions()
 
 useMeta({ title: 'Economic Submissions' });
@@ -271,8 +288,19 @@ const importSector = async () => {
     } else {
         toast.error(economicStore.error || 'Failed to import economic submissions');
         // Errors are already stored in sectorStore.importErrors
+        fileUploadRef.value?.clickClearBtn();
+        selectedFile.value = null;
     }
 };
+
+const downloadTemplate = async () => {
+    const res = await economicStore.downloadTemplate();
+    if (res) {
+        toast.success('Template downloaded successfully');
+    } else {
+        toast.error(economicStore.error || 'Failed to download template');
+    }
+}
 
 const closeModal = () => {
     importEconomicSubmissionModal.value = false;

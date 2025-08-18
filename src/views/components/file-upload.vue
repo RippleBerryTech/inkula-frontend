@@ -2,7 +2,7 @@
   <div class="custom-file-container" data-upload-id="myFirstImage">
     <div class="label-container">
       <label>Upload</label>
-      <a href="javascript:;" class="custom-file-container__image-clear" title="Clear Image">×</a>
+      <a ref="clearBtnRef" href="javascript:;" class="custom-file-container__image-clear" title="Clear Image">×</a>
     </div>
     <label class="custom-file-container__custom-file">
       <input
@@ -25,6 +25,7 @@ import { toast } from 'vue3-toastify';
 
 const emit = defineEmits(['file-selected']);
 const uploadInstance = ref<FileUploadWithPreview | null>(null);
+const clearBtnRef = ref<HTMLAnchorElement | null>(null);
 
 onMounted(() => {
   uploadInstance.value = new FileUploadWithPreview('myFirstImage', {
@@ -57,7 +58,8 @@ const handleFileChange = (event: Event) => {
 
 // Expose clearPreview method if needed
 defineExpose({
-  clearPreview: () => uploadInstance.value?.clearPreview()
+  clearPreview: () => uploadInstance.value?.clearPreview(),
+  clickClearBtn: () => clearBtnRef.value?.click()
 });
 </script>
 

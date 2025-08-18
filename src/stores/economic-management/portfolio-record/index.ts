@@ -177,5 +177,31 @@ export const usePortfolioStore = defineStore('portfolio-record', {
         this.loading = false;
       }
     },
+
+    async downloadTemplate() {
+      this.loading = true;
+      this.error = '';
+      try {
+        const response = await api.get('/portfolio-records/download-import-template', {
+          responseType: 'blob', // important for file download
+        });
+
+        // Create a downloadable link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'portfolio_record_template.xlsx'); // file name
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        return true;
+      } catch (err: any) {
+        this.error = err.response?.data?.message || 'Failed to download template';
+        return false;
+      } finally {
+        this.loading = false;
+      }
+    }
   },
 });

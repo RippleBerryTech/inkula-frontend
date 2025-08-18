@@ -11,8 +11,14 @@
             </div>
 
             <div class="datatable">
-                <div v-if="roleStore.loading">Loading roles...</div>
-                <vue3-datatable :rows="roleStore.roles" :columns="columns" :totalRows="roleStore.roles?.length"
+                <!-- Loading Spinner -->
+                <Loader v-if="roleStore.loading" size="64" color="#4361ee" />
+                <!-- Error -->
+                <div v-else-if="roleStore.error" class="text-red-500 text-center py-4">
+                    {{ roleStore.error }}
+                </div>
+                <!-- DataTable -->
+                <vue3-datatable v-else :rows="roleStore.roles" :columns="columns" :totalRows="roleStore.roles?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
                     firstArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 17h6l-4 -5l4 -5h-6l-4 5z" /></svg>' 
                     lastArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-6l4 5l-4 5h6l4 -5z" /></svg>' 
@@ -167,6 +173,8 @@ import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useRoleStore } from '../../../stores/user-management/role/index';
+
+import Loader from '../../components/loader.vue';
 
 const { hasRole, hasPermission } = usePermissions()
 

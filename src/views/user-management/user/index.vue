@@ -11,9 +11,15 @@
             </div>
 
             <div class="datatable">
-                <div v-if="userStore.loading">Loading users...</div>
-                <div v-if="userStore.error">{{ userStore.error }}</div>
+                <!-- Loading Spinner -->
+                <Loader v-if="userStore.loading" size="64" color="#4361ee" />
+                <!-- Error -->
+                <div v-else-if="userStore.error" class="text-red-500 text-center py-4">
+                    {{ userStore.error }}
+                </div>
+                <!-- DataTable -->
                 <vue3-datatable
+                    v-else
                     :rows="userStore.users"
                     :columns="columns"
                     :totalRows="userStore.users?.length"
@@ -119,6 +125,8 @@ import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useUserStore } from '../../../stores/user-management/user';
+
+import Loader from '../../components/loader.vue';
 
 const { hasRole, hasPermission } = usePermissions()
     useMeta({ title: 'Users' });

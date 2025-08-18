@@ -34,6 +34,7 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
     error: '',
     addEconomicSubmissionError : '',
     editEconomicSubmissionError : '',
+    showEconomicSubmissionError : '',
     deleteEconomicSubmissionError: '',
 
     importErrors: [] as Array<{ row: number; attribute: string; errors: string[] }>,
@@ -103,10 +104,29 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
             this.loading = false;
       }
     },
+    //show economic submission
+    async showEconomicSubmission(id) {
+      this.editEconomicSubmissionError = '';
+      this.loading = true;
+      try {
+        const res = await api.get(`/economic-submissions/show/${id}`);
+        if (res.data.success) {
+          return res.data.data;
+        } else {
+          this.editEconomicSubmissionError = res.data.message;
+          return res.data.success;
+        }
+      } catch (err: any) {
+        this.editEconomicSubmissionError = err.response?.data?.message || 'Failed to show economic submission';
+        return false;
+      } finally {
+            this.loading = false;
+      }
+    },
 
     // update economic submission
     async updateEconomicSubmission(data) {
-      this.editEconomicSubmissionError = '';
+      this.showEconomicSubmissionError = '';
       this.loading = true;
       try {
         const res = await api.put(`/economic-submissions/update/${data.id}`, data);
@@ -119,11 +139,11 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
           });
           return res.data.success;
         } else {
-          this.editEconomicSubmissionError = res.data.message;
+          this.showEconomicSubmissionError = res.data.message;
           return res.data.success;
         }
       } catch (err: any) {
-        this.editEconomicSubmissionError = err.response?.data?.message || 'Failed to update economic submission';
+        this.showEconomicSubmissionError = err.response?.data?.message || 'Failed to update economic submission';
         return false;
       } finally {
             this.loading = false;
@@ -180,5 +200,31 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
         this.loading = false;
       }
     },
+
+    async downloadTemplate() {
+      this.loading = true;
+      this.error = '';
+      try {
+        const response = await api.get('/economic-submissions/download-import-template', {
+          responseType: 'blob', // important for file download
+        });
+
+        // Create a downloadable link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'economic_submission_template.xlsx'); // file name
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        return true;
+      } catch (err: any) {
+        this.error = err.response?.data?.message || 'Failed to download template';
+        return false;
+      } finally {
+        this.loading = false;
+      }
+    }
   },
 });

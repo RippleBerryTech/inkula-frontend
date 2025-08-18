@@ -78,7 +78,7 @@
                             <icon-search class="w-4.5 h-4.5 mx-auto dark:text-[#d0d2d6]" />
                         </button> -->
                     </div>
-                    <div>
+                    <!-- <div>
                         <a href="javascript:;" v-show="store.theme === 'light'"
                             class="flex items-center p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60"
                             @click="store.toggleTheme('dark')">
@@ -94,7 +94,7 @@
                             @click="store.toggleTheme('light')">
                             <IconDeviceLaptop :size="20" stroke-width="1.5" />
                         </a>
-                    </div>
+                    </div> -->
 
 
 
@@ -128,23 +128,23 @@
                                             <div class="group flex items-center px-4 py-2">
                                                 <div class="grid place-content-center rounded">
                                                     <div class="w-12 h-12 relative">
-                                                        <img class="w-12 h-12 rounded-full object-cover"
-                                                            :src="`/assets/images/${notification.profile}`" alt="" />
+                                                        <!-- <img class="w-12 h-12 rounded-full object-cover"
+                                                            :src="`/assets/images/${notification.profile}`" alt="" /> -->
                                                         <span
                                                             class="bg-success w-2 h-2 rounded-full block absolute right-[6px] bottom-0"></span>
                                                     </div>
                                                 </div>
                                                 <div class="ltr:pl-3 rtl:pr-3 flex flex-auto">
                                                     <div class="ltr:pr-3 rtl:pl-3">
-                                                        <h6 v-html="notification.message"></h6>
+                                                        <!-- <h6 v-html="notification.message"></h6>
                                                         <span class="text-xs block font-normal dark:text-gray-500"
-                                                            v-text="notification.time"></span>
+                                                            v-text="notification.time"></span> -->
                                                     </div>
-                                                    <button type="button"
+                                                    <!-- <button type="button"
                                                         class="ltr:ml-auto rtl:mr-auto text-neutral-300 hover:text-danger opacity-0 group-hover:opacity-100"
                                                         @click="removeNotification(notification.id)">
                                                         <icon-x-circle />
-                                                    </button>
+                                                    </button> -->
                                                 </div>
                                             </div>
                                         </li>
@@ -774,24 +774,6 @@ const route = useRoute();
 
 
 const notifications = ref([
-    {
-        id: 1,
-        profile: 'user-profile.jpeg',
-        message: '<strong class="text-sm mr-1">John Doe</strong>invite you to <strong>Prototyping</strong>',
-        time: '45 min ago',
-    },
-    {
-        id: 2,
-        profile: 'profile-34.jpeg',
-        message: '<strong class="text-sm mr-1">Adam Nolan</strong>mentioned you to <strong>UX Basics</strong>',
-        time: '9h Ago',
-    },
-    {
-        id: 3,
-        profile: 'profile-16.jpeg',
-        message: '<strong class="text-sm mr-1">Anna Morgan</strong>Upload a file',
-        time: '9h Ago',
-    },
 ]);
 
 const messages = ref([
@@ -854,9 +836,9 @@ const setActiveDropdown = () => {
     }
 };
 
-const removeNotification = (value: number) => {
-    notifications.value = notifications.value.filter((d) => d.id !== value);
-};
+// const removeNotification = (value: number) => {
+//     notifications.value = notifications.value.filter((d) => d.id !== value);
+// };
 
 const auth = useAuthStore();
 

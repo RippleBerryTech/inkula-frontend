@@ -17,8 +17,14 @@
             </div>
 
             <div class="datatable">
-                <div v-if="portfolioStore.loading">Loading data...</div>
-                <vue3-datatable :rows="portfolioStore.portfolioRecords" :columns="columns" :totalRows="portfolioStore.portfolioRecords?.length"
+                <!-- Loading Spinner -->
+                <Loader v-if="portfolioStore.loading" size="64" color="#4361ee" />
+                <!-- Error -->
+                <div v-else-if="portfolioStore.error" class="text-red-500 text-center py-4">
+                    {{ portfolioStore.error }}
+                </div>
+                <!-- DataTable -->
+                <vue3-datatable v-else :rows="portfolioStore.portfolioRecords" :columns="columns" :totalRows="portfolioStore.portfolioRecords?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
                     firstArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 17h6l-4 -5l4 -5h-6l-4 5z" /></svg>' 
                     lastArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-6l4 5l-4 5h6l4 -5z" /></svg>' 
@@ -122,7 +128,7 @@
                             </button>
                             <div
                                 class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Import Sectors Data
+                                Select File to Portfolio Records Data
                             </div>
                             <div class="p-5" v-if="importPortfolioRecordModal">
                                 <FileUpload ref="fileUploadRef" :show="importPortfolioRecordModal"
@@ -141,6 +147,10 @@
                                 <div class="flex justify-end items-center mt-8">
                                     <button type="button" @click="closeModal"
                                         class="btn btn-outline-danger">Cancel</button>
+                                    <button type="button" @click="downloadTemplate"
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="portfolioStore.loading">
+                                        {{ portfolioStore.loading ? 'Downloading...' : 'Download Template' }}
+                                    </button>
                                     <button type="button" @click="importSector"
                                         class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="portfolioStore.loading">
                                         {{ portfolioStore.loading ? 'Importing...' : 'Import' }}
@@ -171,6 +181,7 @@ import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import FileUpload from '../../components/file-upload.vue';
 
+import Loader from '../../components/loader.vue';
 const { hasRole, hasPermission } = usePermissions()
 
 useMeta({ title: 'Portfolio Records' });
@@ -240,6 +251,8 @@ const importSector = async () => {
     } else {
         toast.error(portfolioStore.error || 'Failed to import portfolio records');
         // Errors are already stored in sectorStore.importErrors
+        fileUploadRef.value?.clickClearBtn();
+        selectedFile.value = null;
     }
 };
 
@@ -248,6 +261,15 @@ const closeModal = () => {
     portfolioStore.importErrors = []; // Clear errors when closing modal
     selectedFile.value = null; // Clear selected file
 };
+
+const downloadTemplate = async () => {
+    const res = await portfolioStore.downloadTemplate();
+    if (res) {
+        toast.success('Template downloaded successfully');
+    } else {
+        toast.error(portfolioStore.error || 'Failed to download template');
+    }
+}
 
 </script>
 

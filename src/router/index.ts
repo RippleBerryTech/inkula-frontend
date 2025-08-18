@@ -115,6 +115,12 @@ const routes: RouteRecordRaw[] = [
                 props: true,
                 component: () => import('../../src/views/economic-management/economic-submissions/edit.vue'),
             },
+            {
+                path: ':id/show',
+                name: 'economic-submission-show',
+                props: true,
+                component: () => import('../../src/views/economic-management/economic-submissions/show.vue'),
+            },
         ],
     },
     {
