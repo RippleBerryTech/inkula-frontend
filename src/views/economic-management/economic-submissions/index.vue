@@ -280,7 +280,7 @@ const importSector = async () => {
     const res = await economicStore.importEconomicSubmissions(formData);
 
     if (res) {
-        toast.success('Sectors imported successfully');
+        toast.success('Economic submissions imported successfully');
         importEconomicSubmissionModal.value = false;
         fileUploadRef.value?.clearPreview();
         selectedFile.value = null;

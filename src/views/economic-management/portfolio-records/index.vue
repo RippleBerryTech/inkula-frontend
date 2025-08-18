@@ -243,7 +243,7 @@ const importSector = async () => {
     const res = await portfolioStore.importPortfolioRecords(formData);
 
     if (res) {
-        toast.success('Sectors imported successfully');
+        toast.success('Portfolio records imported successfully');
         importPortfolioRecordModal.value = false;
         fileUploadRef.value?.clearPreview();
         selectedFile.value = null;
