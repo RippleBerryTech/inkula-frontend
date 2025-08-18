@@ -88,15 +88,13 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useEconomicSubmissionStore } from '@/stores/economic-management/economic-submissions';
+import { usePortfolioStore } from '@/stores/economic-management/portfolio-record';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
-import { helpers, required } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
-import { useSectorStore } from '@/stores/economic-management/sectors';
-import { usePortfolioStore } from '@/stores/economic-management/portfolio-record';
 useMeta({ title: 'Add Portfolio Record' });
 // Reactive form data
 const form = reactive({
@@ -131,6 +129,10 @@ const submitForm = async () => {
   await $v.value.$validate();
 
   if (!$v.value.$invalid) {
+    // 👉 Normalize website field
+    if (form.website && !form.website.startsWith("http://") && !form.website.startsWith("https://")) {
+      form.website = "https://" + form.website;
+    }
     const res = await portfolioStore.addPortfolioRecord(form);
 
     if (res === true) {

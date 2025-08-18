@@ -132,6 +132,10 @@ const submitForm = async () => {
   await $v.value.$validate();
 
   if (!$v.value.$invalid) {
+    // 👉 Normalize website field
+    if (form.website && !form.website.startsWith("http://") && !form.website.startsWith("https://")) {
+      form.website = "https://" + form.website;
+    }
     const ok = await portfolioStore.updatePortfolioRecord({
       id: Number(form.id),
       name: form.name,
