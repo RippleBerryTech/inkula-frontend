@@ -354,7 +354,7 @@
 
                 <div>
                   <span v-if="!economicSubmissionStore.loading">
-                    <button type="submit" class="btn btn-primary mt-0">Add</button>
+                    <button type="submit" class="btn btn-primary mt-0">Update</button>
                   </span>
                   <span v-else>
                     <button type="button" class="btn btn-primary mt-0" disabled>
