@@ -13,7 +13,7 @@
                         Import
                     </button>
                 </div>
-                <router-link v-tippy="'Add Economic Submission'" to="/economic-management/economic-submissions/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add</router-link>
+                <router-link v-tippy="'Add Economic Submission'" to="/economic-and-capital-market-information/economic-submissions/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add</router-link>
             </div>
 
             <div class="datatable">
@@ -209,7 +209,7 @@ import { useMeta } from '../../../composables/use-meta';
 import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
-import { useEconomicSubmissionStore } from '../../../stores/economic-management/economic-submissions/index';
+import { useEconomicSubmissionStore } from '../../../stores/economic-and-capital-market-information/economic-submissions/index';
 import FileUpload from '../../components/file-upload.vue';
 
 import Loader from '../../components/loader.vue';

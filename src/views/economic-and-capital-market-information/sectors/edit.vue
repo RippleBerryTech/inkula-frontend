@@ -31,7 +31,7 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-management/sectors/list" class="group">
+                <router-link to="/economic-and-capital-market-information/sectors/list" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
@@ -59,7 +59,7 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useSectorStore } from '@/stores/economic-management/sectors';
+import { useSectorStore } from '@/stores/economic-and-capital-market-information/sectors';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -102,7 +102,7 @@ const submitForm = async () => {
   })
 
   if (ok) {
-    await appRouter.push('/economic-management/sectors/list')
+    await appRouter.push('/economic-and-capital-market-information/sectors/list')
     toast.success('Sector updated successfully')
   } else {
     toast.error(sectorStore.editSectorError)
@@ -126,7 +126,7 @@ onMounted(async () => {
     form.id = sector.id.toString()
     form.name = sector.name
   } else {
-    await router.push('/economic-management/sectors/list')
+    await router.push('/economic-and-capital-market-information/sectors/list')
     toast.error(sectorStore.editSectorError || 'Sector not found')
   }
 })

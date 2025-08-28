@@ -110,7 +110,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end items-center mt-8 space-x-4">
-                        <router-link to="/economic-management/economic-submissions/list" class="group">
+                        <router-link to="/economic-and-capital-market-information/economic-submissions/list" class="group">
                             <button type="button" class="btn btn-outline-danger">Back</button>
                         </router-link>
                     </div>
@@ -121,9 +121,9 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { useEconomicSubmissionStore } from '@/stores/economic-management/economic-submissions';
+import { useEconomicSubmissionStore } from '@/stores/economic-and-capital-market-information/economic-submissions';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
@@ -189,7 +189,7 @@ onMounted(async () => {
         form.government_bond_rate_15_year = economicSubmission.government_bond_rate_15_year
         form.inflation = economicSubmission.inflation
     } else {
-        await router.push('/economic-management/economic-submissions/list')
+        await router.push('/economic-and-capital-market-information/economic-submissions/list')
         toast.error(economicSubmissionStore.showEconomicSubmissionError || 'Economic Submission not found')
     }
 })

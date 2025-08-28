@@ -5,12 +5,12 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Add Sector</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Edit Sector</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">
               <div class="flex flex-col md:flex-row gap-4">
-                <!-- name -->
+                <!-- Name -->
                 <div class="flex-1"
                   :class="{ 'has-error': $v.form.name.$error, 'has-success': isSubmitForm && !$v.form.name.$error }">
                   <label for="name">Sector Name</label>
@@ -31,13 +31,13 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-management/sectors/list" class="group">
+                <router-link to="/economic-and-capital-market-information/sectors/list" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
                 <div>
                   <span v-if="!sectorStore.loading">
-                    <button type="submit" class="btn btn-primary mt-0">Add</button>
+                    <button type="submit" class="btn btn-primary mt-0">Update</button>
                   </span>
                   <span v-else>
                     <button type="button" class="btn btn-primary mt-0" disabled>
@@ -47,8 +47,8 @@
                 </div>
               </div>
 
-              <div class="text-danger mt-1" v-if="sectorStore.addSectorError">{{
-                sectorStore.addSectorError }}</div>
+              <div class="text-danger mt-1" v-if="sectorStore.editSectorError">{{
+                sectorStore.editSectorError }}</div>
             </form>
           </div>
 
@@ -59,23 +59,28 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useEconomicSubmissionStore } from '@/stores/economic-management/economic-submissions';
+import { useSectorStore } from '@/stores/economic-and-capital-market-information/sectors';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
-import { helpers, required } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
-import { useMeta } from '../../../composables/use-meta';
-import { useSectorStore } from '@/stores/economic-management/sectors';
-useMeta({ title: 'Add Sector' });
+import { useMeta } from '../../../../composables/use-meta';
+useMeta({ title: 'Edit Sector' });
+
+const route = useRoute()
+const router = useRouter()
 // Reactive form data
 const form = reactive({
+  id: '',
   name: '',
 })
 
 // Validation rules
 const rules = {
   form: {
+    id: { required },
     name: { required },
   },
 }
@@ -91,19 +96,18 @@ const submitForm = async () => {
 
   if (!$v.value.$invalid) {
 
-    const res = await sectorStore.addSector(form)
-    if (res) {
-      // Reset form
-      form.name = '',
+    const ok = await sectorStore.updateSector({
+    id: Number(form.id),
+    name: form.name,
+  })
 
-        // Reset validation
-        $v.value.$reset()
-      isSubmitForm.value = false
+  if (ok) {
+    await appRouter.push('/economic-and-capital-market-information/sectors/list')
+    toast.success('Sector updated successfully')
+  } else {
+    toast.error(sectorStore.editSectorError)
+  }
 
-      await appRouter.push('/economic-management/sectors/list')
-      // Show success message
-      toast.success("Sector added successfully")
-    }
   } else {
     toast.error('Validation Failed')
   }
@@ -111,9 +115,21 @@ const submitForm = async () => {
 
 const sectorStore = useSectorStore();
 
-onMounted(() => {
-})
+onMounted(async () => {
+  const sectorId = route.params.id
+  sectorStore.editSectorError = ''
 
+  // fetch the role directly from API
+  const sector = await sectorStore.editsector(sectorId)
+
+  if (sector) {
+    form.id = sector.id.toString()
+    form.name = sector.name
+  } else {
+    await router.push('/economic-and-capital-market-information/sectors/list')
+    toast.error(sectorStore.editSectorError || 'Sector not found')
+  }
+})
 
 
 </script>

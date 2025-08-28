@@ -5,7 +5,7 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Edit Economic Submission</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Add Economic Submission</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-8" @submit.prevent="submitForm">
@@ -348,13 +348,13 @@
 
               <!-- Form Actions -->
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-management/economic-submissions/list" class="group">
+                <router-link to="/economic-and-capital-market-information/economic-submissions/list" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
                 <div>
                   <span v-if="!economicSubmissionStore.loading">
-                    <button type="submit" class="btn btn-primary mt-0">Update</button>
+                    <button type="submit" class="btn btn-primary mt-0">Add</button>
                   </span>
                   <span v-else>
                     <button type="button" class="btn btn-primary mt-0" disabled>
@@ -370,7 +370,6 @@
             </form>
           </div>
 
-
         </div>
       </div>
     </div>
@@ -378,21 +377,16 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useEconomicSubmissionStore } from '@/stores/economic-management/economic-submissions';
+import { useEconomicSubmissionStore } from '@/stores/economic-and-capital-market-information/economic-submissions';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
-useMeta({ title: 'Edit Economic Submission' });
-
-const route = useRoute()
-const router = useRouter()
+useMeta({ title: 'Add Economic Submission' });
 // Reactive form data
 const form = reactive({
-  id: '',
   mpile_high_yield_debt_fund: '',
   mpile_money_market_fund: '',
   mpile_local_equity_fund: '',
@@ -421,7 +415,6 @@ const floatValidator = helpers.regex(/^\d+(\.\d+)?$/)
 // Validation rules
 const rules = {
   form: {
-    id: { required },
     mpile_high_yield_debt_fund: { required, floatValidator },
     mpile_money_market_fund: { required, floatValidator },
     mpile_local_equity_fund: { required, floatValidator },
@@ -453,34 +446,35 @@ const submitForm = async () => {
 
   if (!$v.value.$invalid) {
 
-    const ok = await economicSubmissionStore.updateEconomicSubmission({
-    id: Number(form.id),
-    mpile_high_yield_debt_fund: form.mpile_high_yield_debt_fund,
-    mpile_money_market_fund: form.mpile_money_market_fund,
-    mpile_local_equity_fund: form.mpile_local_equity_fund,
-    mpile_offshore_equity_fund: form.mpile_offshore_equity_fund,
-    mpile_property_fund: form.mpile_property_fund,
-    luse_free_float_index: form.luse_free_float_index,
-    luse_all_share_index: form.luse_all_share_index,
-    stanbic_bank_zambia_composite_pmi: form.stanbic_bank_zambia_composite_pmi,
-    copper_prices_usd_per_ton: form.copper_prices_usd_per_ton,
-    money_market_liquidity: form.money_market_liquidity,
-    average_zmw_per_usd: form.average_zmw_per_usd,
-    treasury_bill_rate_91_day: form.treasury_bill_rate_91_day,
-    treasury_bill_rate_364_day: form.treasury_bill_rate_364_day,
-    government_bond_rate_5_year: form.government_bond_rate_5_year,
-    government_bond_rate_10_year: form.government_bond_rate_10_year,
-    government_bond_rate_15_year: form.government_bond_rate_15_year,
-    inflation: form.inflation
-  })
+    const res = await economicSubmissionStore.addEconomicSubmission(form)
+    if (res) {
+      // Reset form
+      form.mpile_high_yield_debt_fund = '',
+        form.mpile_money_market_fund = '',
+        form.mpile_local_equity_fund = '',
+        form.mpile_offshore_equity_fund = '',
+        form.mpile_property_fund = '',
+        form.luse_free_float_index = '',
+        form.luse_all_share_index = '',
+        form.stanbic_bank_zambia_composite_pmi = '',
+        form.copper_prices_usd_per_ton = '',
+        form.money_market_liquidity = '',
+        form.average_zmw_per_usd = '',
+        form.treasury_bill_rate_91_day = '',
+        form.treasury_bill_rate_364_day = '',
+        form.government_bond_rate_5_year = '',
+        form.government_bond_rate_10_year = '',
+        form.government_bond_rate_15_year = '',
+        form.inflation = '',
 
-  if (ok) {
-    await appRouter.push('/economic-management/economic-submissions/list')
-    toast.success('Economic Submission updated successfully')
-  } else {
-    toast.error(economicSubmissionStore.editEconomicSubmissionError)
-  }
+        // Reset validation
+        $v.value.$reset()
+      isSubmitForm.value = false
 
+      await appRouter.push('/economic-and-capital-market-information/economic-submissions/list')
+      // Show success message
+      toast.success("Economic Submission added successfully")
+    }
   } else {
     toast.error('Validation Failed')
   }
@@ -488,37 +482,9 @@ const submitForm = async () => {
 
 const economicSubmissionStore = useEconomicSubmissionStore();
 
-onMounted(async () => {
-  const economicSubmissionId = route.params.id
-  economicSubmissionStore.editEconomicSubmissionError = ''
-
-  // fetch the role directly from API
-  const economicSubmission = await economicSubmissionStore.editEconomicSubmission(economicSubmissionId)
-
-  if (economicSubmission) {
-    form.id = economicSubmission.id.toString()
-    form.mpile_high_yield_debt_fund = economicSubmission.mpile_high_yield_debt_fund
-    form.mpile_money_market_fund = economicSubmission.mpile_money_market_fund
-    form.mpile_local_equity_fund = economicSubmission.mpile_local_equity_fund
-    form.mpile_offshore_equity_fund = economicSubmission.mpile_offshore_equity_fund
-    form.mpile_property_fund = economicSubmission.mpile_property_fund
-    form.luse_free_float_index = economicSubmission.luse_free_float_index
-    form.luse_all_share_index = economicSubmission.luse_all_share_index
-    form.stanbic_bank_zambia_composite_pmi = economicSubmission.stanbic_bank_zambia_composite_pmi
-    form.copper_prices_usd_per_ton = economicSubmission.copper_prices_usd_per_ton
-    form.money_market_liquidity = economicSubmission.money_market_liquidity
-    form.average_zmw_per_usd = economicSubmission.average_zmw_per_usd
-    form.treasury_bill_rate_91_day = economicSubmission.treasury_bill_rate_91_day
-    form.treasury_bill_rate_364_day = economicSubmission.treasury_bill_rate_364_day
-    form.government_bond_rate_5_year = economicSubmission.government_bond_rate_5_year
-    form.government_bond_rate_10_year = economicSubmission.government_bond_rate_10_year
-    form.government_bond_rate_15_year = economicSubmission.government_bond_rate_15_year
-    form.inflation = economicSubmission.inflation
-  } else {
-    await router.push('/economic-management/economic-submissions/list')
-    toast.error(economicSubmissionStore.editEconomicSubmissionError || 'Economic Submission not found')
-  }
+onMounted(() => {
 })
+
 
 
 </script>

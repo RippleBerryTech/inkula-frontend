@@ -89,13 +89,13 @@
                             >
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
-                            <span>ECONOMIC MANAGEMENT</span>
+                            <span>ECONOMIC AND CAPITAL MARKET INFORMATION</span>
                         </h2>
 
                         <li v-if="hasPermission('View Economic Submission') || hasPermission('View Portfolio Record') || hasPermission('View Sector')" class="nav-item">
                             <ul>
                                 <li v-if="hasPermission('View Economic Submission')" class="nav-item">
-                                    <router-link to="/economic-management/economic-submissions/list" class="group" @click="toggleMobileMenu" :class="{ active: isEconomicSubmissionSection }">
+                                    <router-link to="/economic-and-capital-market-information/economic-submissions/list" class="group" @click="toggleMobileMenu" :class="{ active: isEconomicSubmissionSection }">
                                         <div class="flex items-center">
                                             <IconFileDollar :size="20" stroke-width="1.5" />
                                             <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">
@@ -105,7 +105,7 @@
                                     </router-link>
                                 </li>
                                 <li v-if="hasPermission('View Portfolio Record')" class="nav-item">
-                                    <router-link to="/economic-management/portfolio-records/list" class="group" @click="toggleMobileMenu" :class="{ active: isPortfolioRecordSection }">
+                                    <router-link to="/economic-and-capital-market-information/portfolio-records/list" class="group" @click="toggleMobileMenu" :class="{ active: isPortfolioRecordSection }">
                                         <div class="flex items-center">
                                             <IconBriefcase :size="20" stroke-width="1.5" />
 
@@ -116,7 +116,7 @@
                                     </router-link>
                                 </li>
                                 <li v-if="hasPermission('View Sector')" class="nav-item">
-                                    <router-link to="/economic-management/sectors/list" class="group" @click="toggleMobileMenu" :class="{ active: isSectorSection }">
+                                    <router-link to="/economic-and-capital-market-information/sectors/list" class="group" @click="toggleMobileMenu" :class="{ active: isSectorSection }">
                                         <div class="flex items-center">
                                             <IconBuildingSkyscraper :size="20" stroke-width="1.5" />
 
@@ -1022,9 +1022,9 @@ const { hasRole, hasPermission } = usePermissions()
     // true whenever the path begins with "/roles"
     const isRolesSection = computed(() => route.path.startsWith('/roles'))
     const isUsersSection = computed(() => route.path.startsWith('/users'))
-    const isEconomicSubmissionSection = computed(() => route.path.startsWith('/economic-management/economic-submissions'))
-    const isSectorSection = computed(() => route.path.startsWith('/economic-management/sectors'))
-    const isPortfolioRecordSection = computed(() => route.path.startsWith('/economic-management/portfolio-records'))
+    const isEconomicSubmissionSection = computed(() => route.path.startsWith('/economic-and-capital-market-information/economic-submissions'))
+    const isSectorSection = computed(() => route.path.startsWith('/economic-and-capital-market-information/sectors'))
+    const isPortfolioRecordSection = computed(() => route.path.startsWith('/economic-and-capital-market-information/portfolio-records'))
 
 
     const store = useAppStore();
