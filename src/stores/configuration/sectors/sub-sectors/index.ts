@@ -28,7 +28,7 @@ export const useSubSectorStore = defineStore('sub-sector', {
       this.error = '';
 
       try {
-        const res = await api.get('/sectors/'+id+'/sub-sectors/list'); // assuming your endpoint is /roles
+        const res = await api.get('/configuration/sectors/'+id+'/sub-sectors/list'); // assuming your endpoint is /roles
         this.sectors = res.data.data;
         this.hasFetchedSectors = true     
       } catch (err: any) {
@@ -47,7 +47,7 @@ export const useSubSectorStore = defineStore('sub-sector', {
       this.addSubSectorError = '';
       this.loading = true;
       try {
-        const res = await api.post('/sectors/'+data.sector_id+'/sub-sectors/store', data);
+        const res = await api.post('/configuration/sectors/'+data.sector_id+'/sub-sectors/store', data);
         if (res.data.success) {
           this.sectors.push(res.data.data.sectors);
           return res.data.success;
@@ -68,7 +68,7 @@ export const useSubSectorStore = defineStore('sub-sector', {
       this.editSubSectorError = '';
       this.loading = true;
       try {
-        var url = `/sectors/`+id +`/sub-sectors/edit/${sub_sector_id}`;
+        var url = `/configuration/sectors/`+id +`/sub-sectors/edit/${sub_sector_id}`;
         console.log(url);
         const res = await api.get(url);
         console.log(JSON.stringify(res.data, null, 2));
@@ -91,7 +91,7 @@ export const useSubSectorStore = defineStore('sub-sector', {
       this.editSubSectorError = '';
       this.loading = true;
       try {
-        const res = await api.put(`/sectors/`+data.sector_id+`/sub-sectors/update/${data.id}`, data);
+        const res = await api.put(`/configuration/sectors/`+data.sector_id+`/sub-sectors/update/${data.id}`, data);
         console.log(res);
         if (res.data.success) {
           this.sectors = this.sectors.map((data) => {
@@ -118,7 +118,7 @@ export const useSubSectorStore = defineStore('sub-sector', {
       this.deleteSubSectorError = '';
       this.loading = true;
       try {
-        const res = await api.delete(`/sectors/`+id+`/sub-sectors/delete/${sub_sector_id}`);
+        const res = await api.delete(`/configuration/sectors/`+id+`/sub-sectors/delete/${sub_sector_id}`);
         if (res.data.success) {
           this.sectors = this.sectors.filter((data) => data.id !== id);
           return res.data.success;
@@ -133,60 +133,5 @@ export const useSubSectorStore = defineStore('sub-sector', {
             this.loading = false;
       }
     },
-    // async importSectors(file: FormData) {
-    //   this.loading = true;
-    //   this.error = '';
-    //   this.importErrors = []; // Clear previous errors
-    //   try {
-    //     const res = await api.post('/sectors/import', file, {
-    //       headers: {
-    //         'Content-Type': 'multipart/form-data',
-    //       },
-    //     });
-    //     console.log(JSON.stringify(res.data, null, 2));
-    //     if (res.data.success) {
-    //       //clear previous sectors
-    //       this.sectors = [];
-    //       //set new sectors
-    //       this.sectors = res.data.data.sectors;
-    //       return res.data.success;
-    //     } else {
-    //       this.error = res.data.message;
-    //       this.importErrors = res.data.errors || []; // Store errors
-    //       return false;
-    //     }
-    //   } catch (err: any) {
-    //     this.error = err.response?.data?.message || 'Failed to import sectors';
-    //     this.importErrors = err.response?.data?.errors || [];
-    //     return false;
-    //   } finally {
-    //     this.loading = false;
-    //   }
-    // },
-    // async downloadTemplate() {
-    //   this.loading = true;
-    //   this.error = '';
-    //   try {
-    //     const response = await api.get('/sectors/download-import-template', {
-    //       responseType: 'blob', // important for file download
-    //     });
-
-    //     // Create a downloadable link
-    //     const url = window.URL.createObjectURL(new Blob([response.data]));
-    //     const link = document.createElement('a');
-    //     link.href = url;
-    //     link.setAttribute('download', 'sector_template.xlsx'); // file name
-    //     document.body.appendChild(link);
-    //     link.click();
-    //     document.body.removeChild(link);
-
-    //     return true;
-    //   } catch (err: any) {
-    //     this.error = err.response?.data?.message || 'Failed to download template';
-    //     return false;
-    //   } finally {
-    //     this.loading = false;
-    //   }
-    // }
   },
 });

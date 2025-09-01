@@ -58,7 +58,7 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useSubSectorStore } from '@/stores/economic-and-capital-market-information/sectors/sub-sectors';
+import { useSubSectorStore } from '@/stores/configuration/sectors/sub-sectors';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';

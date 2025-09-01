@@ -118,7 +118,7 @@ import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 
-import { useSubSectorStore } from '@/stores/economic-and-capital-market-information/sectors/sub-sectors';
+import { useSubSectorStore } from '@/stores/configuration/sectors/sub-sectors';
 import Loader from '../../../components/loader.vue';
 
 const { hasRole, hasPermission } = usePermissions()

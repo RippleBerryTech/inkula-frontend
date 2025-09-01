@@ -5,7 +5,7 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Add Portfolio Record</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Add Listed Company Information</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">
@@ -60,12 +60,12 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-and-capital-market-information/portfolio-records/list" class="group">
+                <router-link :to="{name: 'listed-company-information-list'}" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
                 <div>
-                  <span v-if="!portfolioStore.loading">
+                  <span v-if="!listedCompanyInformationStore.loading">
                     <button type="submit" class="btn btn-primary mt-0">Add</button>
                   </span>
                   <span v-else>
@@ -76,8 +76,8 @@
                 </div>
               </div>
 
-              <div class="text-danger mt-1" v-if="portfolioStore.addPortfolioRecordError">{{
-                portfolioStore.addPortfolioRecordError }}</div>
+              <div class="text-danger mt-1" v-if="listedCompanyInformationStore.addPortfolioRecordError">{{
+                listedCompanyInformationStore.addPortfolioRecordError }}</div>
             </form>
           </div>
 
@@ -88,14 +88,14 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { usePortfolioStore } from '@/stores/economic-and-capital-market-information/portfolio-record';
+import { useListedCompanyInformationStore } from '@/stores/configuration/portfolio-record/listed-company-information';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../../composables/use-meta';
-useMeta({ title: 'Add Portfolio Record' });
+useMeta({ title: 'Add Listed Company Information' });
 // Reactive form data
 const form = reactive({
   name: '',
@@ -133,7 +133,7 @@ const submitForm = async () => {
     if (form.website && !form.website.startsWith("http://") && !form.website.startsWith("https://")) {
       form.website = "https://" + form.website;
     }
-    const res = await portfolioStore.addPortfolioRecord(form);
+    const res = await listedCompanyInformationStore.addListedCompanyInformation(form);
 
     if (res === true) {
       // Reset form
@@ -144,18 +144,20 @@ const submitForm = async () => {
       $v.value.$reset();
       isSubmitForm.value = false;
 
-      toast.success("Portfolio Record added successfully");
-      await appRouter.push('/economic-and-capital-market-information/portfolio-records/list');
+      toast.success("Listed Company Information added successfully");
+      await appRouter.push({
+        name: 'listed-company-information-list',
+      });
     } else {
       // Map backend field errors (if Laravel sends them in `errors`)
-      for (const field in portfolioStore.addPortfolioRecordFieldErrors) {
-        backendErrors[field] = portfolioStore.addPortfolioRecordFieldErrors[field][0];
+      for (const field in listedCompanyInformationStore.addPortfolioRecordFieldErrors) {
+        backendErrors[field] = listedCompanyInformationStore.addPortfolioRecordFieldErrors[field][0];
       }
     }
   }
 };
 
-const portfolioStore = usePortfolioStore();
+const listedCompanyInformationStore = useListedCompanyInformationStore();
 
 onMounted(() => {
 })

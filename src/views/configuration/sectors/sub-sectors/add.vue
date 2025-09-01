@@ -58,15 +58,14 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useSectorStore } from '@/stores/economic-and-capital-market-information/sectors';
+import { useSubSectorStore } from '@/stores/configuration/sectors/sub-sectors';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../../composables/use-meta';
-import { useRoute, useRouter } from 'vue-router';
-import { useSubSectorStore } from '@/stores/economic-and-capital-market-information/sectors/sub-sectors';
 useMeta({ title: 'Add Sub Sector' });
 // Reactive form data
 

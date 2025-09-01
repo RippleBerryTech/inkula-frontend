@@ -31,7 +31,7 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link :to="{name: 'sector-list'}" class="group">
+                <router-link :to="{name: 'sectors-list'}" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
@@ -59,7 +59,7 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useSectorStore } from '@/stores/economic-and-capital-market-information/sectors';
+import { useSectorStore } from '@/stores/configuration/sectors';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -99,7 +99,9 @@ const submitForm = async () => {
         $v.value.$reset()
       isSubmitForm.value = false
 
-      await appRouter.push('/economic-and-capital-market-information/sectors/list')
+      await appRouter.push({
+        name: 'sectors-list',
+      })
       // Show success message
       toast.success("Sector added successfully")
     }

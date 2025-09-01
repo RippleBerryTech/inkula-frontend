@@ -27,7 +27,7 @@ export const useSectorStore = defineStore('sector', {
       this.error = '';
 
       try {
-        const res = await api.get('/sectors/list'); // assuming your endpoint is /roles
+        const res = await api.get('/configuration/sectors/list'); // assuming your endpoint is /roles
         this.sectors = res.data.data;
         this.hasFetchedSectors = true     
       } catch (err: any) {
@@ -46,7 +46,7 @@ export const useSectorStore = defineStore('sector', {
       this.addSectorError = '';
       this.loading = true;
       try {
-        const res = await api.post('/sectors/store', data);
+        const res = await api.post('/configuration/sectors/store', data);
         if (res.data.success) {
           this.sectors.push(res.data.data.sectors);
           return res.data.success;
@@ -67,7 +67,7 @@ export const useSectorStore = defineStore('sector', {
       this.editSectorError = '';
       this.loading = true;
       try {
-        const res = await api.get(`/sectors/edit/${id}`);
+        const res = await api.get(`/configuration/sectors/edit/${id}`);
         if (res.data.success) {
           return res.data.data;
         } else {
@@ -87,7 +87,7 @@ export const useSectorStore = defineStore('sector', {
       this.editSectorError = '';
       this.loading = true;
       try {
-        const res = await api.put(`/sectors/update/${data.id}`, data);
+        const res = await api.put(`/configuration/sectors/update/${data.id}`, data);
         console.log(res);
         if (res.data.success) {
           this.sectors = this.sectors.map((role) => {
@@ -114,7 +114,7 @@ export const useSectorStore = defineStore('sector', {
       this.deleteSectorError = '';
       this.loading = true;
       try {
-        const res = await api.delete(`/sectors/delete/${id}`);
+        const res = await api.delete(`/configuration/sectors/delete/${id}`);
         if (res.data.success) {
           this.sectors = this.sectors.filter((role) => role.id !== id);
           return res.data.success;
@@ -129,60 +129,5 @@ export const useSectorStore = defineStore('sector', {
             this.loading = false;
       }
     },
-    // async importSectors(file: FormData) {
-    //   this.loading = true;
-    //   this.error = '';
-    //   this.importErrors = []; // Clear previous errors
-    //   try {
-    //     const res = await api.post('/sectors/import', file, {
-    //       headers: {
-    //         'Content-Type': 'multipart/form-data',
-    //       },
-    //     });
-    //     console.log(JSON.stringify(res.data, null, 2));
-    //     if (res.data.success) {
-    //       //clear previous sectors
-    //       this.sectors = [];
-    //       //set new sectors
-    //       this.sectors = res.data.data.sectors;
-    //       return res.data.success;
-    //     } else {
-    //       this.error = res.data.message;
-    //       this.importErrors = res.data.errors || []; // Store errors
-    //       return false;
-    //     }
-    //   } catch (err: any) {
-    //     this.error = err.response?.data?.message || 'Failed to import sectors';
-    //     this.importErrors = err.response?.data?.errors || [];
-    //     return false;
-    //   } finally {
-    //     this.loading = false;
-    //   }
-    // },
-    // async downloadTemplate() {
-    //   this.loading = true;
-    //   this.error = '';
-    //   try {
-    //     const response = await api.get('/sectors/download-import-template', {
-    //       responseType: 'blob', // important for file download
-    //     });
-
-    //     // Create a downloadable link
-    //     const url = window.URL.createObjectURL(new Blob([response.data]));
-    //     const link = document.createElement('a');
-    //     link.href = url;
-    //     link.setAttribute('download', 'sector_template.xlsx'); // file name
-    //     document.body.appendChild(link);
-    //     link.click();
-    //     document.body.removeChild(link);
-
-    //     return true;
-    //   } catch (err: any) {
-    //     this.error = err.response?.data?.message || 'Failed to download template';
-    //     return false;
-    //   } finally {
-    //     this.loading = false;
-    //   }
-    // }
   },
 });

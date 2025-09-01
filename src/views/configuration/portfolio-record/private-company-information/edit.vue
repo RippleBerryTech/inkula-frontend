@@ -5,7 +5,7 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Edit Portfolio Record</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Edit Private Company Information</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">
@@ -59,12 +59,12 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-and-capital-market-information/portfolio-records/list" class="group">
+                <router-link :to="{name: 'private-company-information-list'}" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
                 <div>
-                  <span v-if="!portfolioStore.loading">
+                  <span v-if="!privateCompanyInformationStore.loading">
                     <button type="submit" class="btn btn-primary mt-0">Update</button>
                   </span>
                   <span v-else>
@@ -75,8 +75,8 @@
                 </div>
               </div>
 
-              <div class="text-danger mt-1" v-if="portfolioStore.editPortfolioRecordError">{{
-                portfolioStore.editPortfolioRecordError }}</div>
+              <div class="text-danger mt-1" v-if="privateCompanyInformationStore.editPortfolioRecordError">{{
+                privateCompanyInformationStore.editPortfolioRecordError }}</div>
             </form>
           </div>
 
@@ -87,7 +87,7 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { usePortfolioStore } from '@/stores/economic-and-capital-market-information/portfolio-record';
+import { usePrivateCompanyInformationStore } from '@/stores/configuration/portfolio-record/private-company-information';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -136,40 +136,44 @@ const submitForm = async () => {
     if (form.website && !form.website.startsWith("http://") && !form.website.startsWith("https://")) {
       form.website = "https://" + form.website;
     }
-    const ok = await portfolioStore.updatePortfolioRecord({
+    const ok = await privateCompanyInformationStore.updatePrivateCompanyInformation({
       id: Number(form.id),
       name: form.name,
       website: form.website
     });
 
     if (ok === true) {
-      toast.success('Portfolio Record updated successfully');
-      await appRouter.push('/economic-and-capital-market-information/portfolio-records/list');
+      await appRouter.push({
+        name: 'private-company-information-list',
+      });
+      toast.success('Private Company Information updated successfully');
     } else {
       // Map backend field errors
-      for (const field in portfolioStore.editPortfolioRecordFieldErrors) {
-        backendErrors[field] = portfolioStore.editPortfolioRecordFieldErrors[field][0];
+      for (const field in privateCompanyInformationStore.editPortfolioRecordFieldErrors) {
+        backendErrors[field] = privateCompanyInformationStore.editPortfolioRecordFieldErrors[field][0];
       }
     }
   }
 };
 
-const portfolioStore = usePortfolioStore();
+const privateCompanyInformationStore = usePrivateCompanyInformationStore();
 
 onMounted(async () => {
   const portfolioRecordId = route.params.id
-  portfolioStore.editPortfolioRecordError = ''
+  privateCompanyInformationStore.editPortfolioRecordError = ''
 
   // fetch the role directly from API
-  const portfolioRecord = await portfolioStore.editPortfolioRecord(portfolioRecordId)
+  const portfolioRecord = await privateCompanyInformationStore.editPrivateCompanyInformation(portfolioRecordId)
 
   if (portfolioRecord) {
     form.id = portfolioRecord.id.toString()
     form.name = portfolioRecord.name
     form.website = portfolioRecord.website
   } else {
-    await router.push('/economic-and-capital-market-information/portfolio-records/list')
-    toast.error(portfolioStore.editPortfolioRecordError || 'Portfolio Record not found')
+     await appRouter.push({
+        name: 'private-company-information-list',
+      });
+    toast.error(privateCompanyInformationStore.editPortfolioRecordError || 'Portfolio Record not found')
   }
 })
 

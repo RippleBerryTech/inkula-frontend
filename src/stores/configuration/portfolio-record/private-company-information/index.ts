@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
-import api from '../../../plugins/axios'; // your Axios instance
+import api from '../../../../plugins/axios'; // your Axios instance
 
-export const usePortfolioStore = defineStore('portfolio-record', {
+export const usePrivateCompanyInformationStore = defineStore('private-company-information', {
+
   state: () => ({
     portfolioRecords: [] as Array<{ 
       id: number;
@@ -25,13 +26,13 @@ export const usePortfolioStore = defineStore('portfolio-record', {
   }),
 
   actions: {
-    async fetchPortfolioRecords(force = false) {
+    async fetchPrivateCompanyInformation(force = false) {
       if (this.hasFetchedPortfolioRecords && !force) return
       this.loading = true;
       this.error = '';
 
       try {
-        const res = await api.get('/portfolio-records/list'); // assuming your endpoint is /roles
+        const res = await api.get('/configuration/portfolio-record/private-company-information/list'); // assuming your endpoint is /roles
         this.portfolioRecords = res.data.data;
         this.hasFetchedPortfolioRecords = true     
       } catch (err: any) {
@@ -46,15 +47,15 @@ export const usePortfolioStore = defineStore('portfolio-record', {
     },
 
     // add portfolio record
-    async addPortfolioRecord(data) {
+    async addPrivateCompanyInformation(data) {
       this.addPortfolioRecordError = '';
       this.addPortfolioRecordFieldErrors = {};
       this.loading = true;
 
       try {
-        const res = await api.post('/portfolio-records/store', data);
+        const res = await api.post('/configuration/portfolio-record/private-company-information/store', data);
         if (res.data.success) {
-          this.portfolioRecords.push(res.data.data.portfolioRecords);
+          this.portfolioRecords.push(res.data.data.privateCompanyInformation);
           return true;
         } else {
           this.addPortfolioRecordError = res.data.message;
@@ -75,11 +76,11 @@ export const usePortfolioStore = defineStore('portfolio-record', {
     },
 
     //edit sector
-    async editPortfolioRecord(id) {
+    async editPrivateCompanyInformation(id) {
       this.editPortfolioRecordError = '';
       this.loading = true;
       try {
-        const res = await api.get(`/portfolio-records/edit/${id}`);
+        const res = await api.get(`/configuration/portfolio-record/private-company-information/edit/${id}`);
         if (res.data.success) {
           return res.data.data;
         } else {
@@ -94,17 +95,17 @@ export const usePortfolioStore = defineStore('portfolio-record', {
       }
     },
 
-    async updatePortfolioRecord(data) {
+    async updatePrivateCompanyInformation(data) {
       this.editPortfolioRecordError = '';
       this.editPortfolioRecordFieldErrors = {};
       this.loading = true;
 
       try {
-        const res = await api.put(`/portfolio-records/update/${data.id}`, data);
+        const res = await api.put(`/configuration/portfolio-record/private-company-information/update/${data.id}`, data);
         if (res.data.success) {
           this.portfolioRecords = this.portfolioRecords.map((record) => {
             if (record.id === data.id) {
-              return res.data.data.portfolioRecord;
+              return res.data.data.privateCompanyInformation;
             }
             return record;
           });
@@ -128,11 +129,11 @@ export const usePortfolioStore = defineStore('portfolio-record', {
     },
 
     //delete portfolio record
-    async deletePortfolioRecord(id) {
+    async deletePrivateCompanyInformation(id) {
       this.deletePortfolioRecordError = '';
       this.loading = true;
       try {
-        const res = await api.delete(`/portfolio-records/delete/${id}`);
+        const res = await api.delete(`/configuration/portfolio-record/private-company-information/delete/${id}`);
         if (res.data.success) {
           this.portfolioRecords = this.portfolioRecords.filter((role) => role.id !== id);
           return res.data.success;
@@ -148,12 +149,12 @@ export const usePortfolioStore = defineStore('portfolio-record', {
       }
     },
 
-    async importPortfolioRecords(file: FormData) {
+    async importPrivateCompanyInformation(file: FormData) {
       this.loading = true;
       this.error = '';
       this.importErrors = []; // Clear previous errors
       try {
-        const res = await api.post('/portfolio-records/import', file, {
+        const res = await api.post('/configuration/portfolio-record/private-company-information/import', file, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -162,7 +163,7 @@ export const usePortfolioStore = defineStore('portfolio-record', {
         if (res.data.success) {
           // clear previous records and set new ones
           this.portfolioRecords = [];
-          this.portfolioRecords = res.data.data.portfolioRecords;
+          this.portfolioRecords = res.data.data.privateCompanyInformation;
           return res.data.success;
         } else {
           this.error = res.data.message;
@@ -182,7 +183,7 @@ export const usePortfolioStore = defineStore('portfolio-record', {
       this.loading = true;
       this.error = '';
       try {
-        const response = await api.get('/portfolio-records/download-import-template', {
+        const response = await api.get('/configuration/portfolio-record/private-company-information/download-import-template', {
           responseType: 'blob', // important for file download
         });
 

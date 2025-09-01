@@ -13,18 +13,18 @@
                         Import
                     </button>
                 </div>
-                <router-link to="/economic-and-capital-market-information/portfolio-records/add" v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary">Add</router-link>
+                <router-link :to="{name: 'private-company-information-add'}" v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary">Add</router-link>
             </div>
 
             <div class="datatable">
                 <!-- Loading Spinner -->
-                <Loader v-if="portfolioStore.loading" size="64" color="#4361ee" />
+                <Loader v-if="privateCompanyInformationStore.loading" size="64" color="#4361ee" />
                 <!-- Error -->
-                <div v-else-if="portfolioStore.error" class="text-red-500 text-center py-4">
-                    {{ portfolioStore.error }}
+                <div v-else-if="privateCompanyInformationStore.error" class="text-red-500 text-center py-4">
+                    {{ privateCompanyInformationStore.error }}
                 </div>
                 <!-- DataTable -->
-                <vue3-datatable v-else :rows="portfolioStore.portfolioRecords" :columns="columns" :totalRows="portfolioStore.portfolioRecords?.length"
+                <vue3-datatable v-else :rows="privateCompanyInformationStore.portfolioRecords" :columns="columns" :totalRows="privateCompanyInformationStore.portfolioRecords?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
                     firstArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 17h6l-4 -5l4 -5h-6l-4 5z" /></svg>' 
                     lastArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-6l4 5l-4 5h6l4 -5z" /></svg>' 
@@ -90,7 +90,7 @@
                                 Confirm your action!
                             </div>
                             <div class="p-5">
-                                <span class="text-gray-500">Are you sure you want to delete this portfolio record?</span>
+                                <span class="text-gray-500">Are you sure you want to delete this private company information?</span>
 
                                 <div class="flex justify-end items-center mt-8">
                                     <button type="button" @click="deletePortfolioRecordModal = false"
@@ -128,17 +128,17 @@
                             </button>
                             <div
                                 class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Portfolio Records Data
+                                Select File to Private Company Information
                             </div>
                             <div class="p-5" v-if="importPortfolioRecordModal">
                                 <FileUpload ref="fileUploadRef" :show="importPortfolioRecordModal"
                                     @file-selected="handleFileSelected" />
 
                                 <!-- Error List -->
-                                <div v-if="portfolioStore.importErrors.length > 0" class="mt-4">
+                                <div v-if="privateCompanyInformationStore.importErrors.length > 0" class="mt-4">
                                     <p class="text-danger font-semibold">Import Errors:</p>
                                     <ul class="list-disc list-inside text-danger">
-                                        <li v-for="error in portfolioStore.importErrors" :key="error.row">
+                                        <li v-for="error in privateCompanyInformationStore.importErrors" :key="error.row">
                                             Row {{ error.row }}: {{ error.errors.join(', ') }}
                                         </li>
                                     </ul>
@@ -148,12 +148,12 @@
                                     <button type="button" @click="closeModal"
                                         class="btn btn-outline-danger">Cancel</button>
                                     <button type="button" @click="downloadTemplate"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="portfolioStore.loading">
-                                        {{ portfolioStore.loading ? 'Downloading...' : 'Download Template' }}
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="privateCompanyInformationStore.loading">
+                                        {{ privateCompanyInformationStore.loading ? 'Downloading...' : 'Download Template' }}
                                     </button>
-                                    <button type="button" @click="importSector"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="portfolioStore.loading">
-                                        {{ portfolioStore.loading ? 'Importing...' : 'Import' }}
+                                    <button type="button" @click="importPrivateCompanyInformation"
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="privateCompanyInformationStore.loading">
+                                        {{ privateCompanyInformationStore.loading ? 'Importing...' : 'Import' }}
                                     </button>
                                 </div>
                             </div>
@@ -176,15 +176,15 @@ import { computed, ref } from 'vue';
 import { useMeta } from '../../../../composables/use-meta';
 
 import { usePermissions } from '@/composables/usePermissions';
-import { usePortfolioStore } from '@/stores/economic-and-capital-market-information/portfolio-record';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import FileUpload from '../../../components/file-upload.vue';
 
+import { usePrivateCompanyInformationStore } from '@/stores/configuration/portfolio-record/private-company-information';
 import Loader from '../../../components/loader.vue';
 const { hasRole, hasPermission } = usePermissions()
 
-useMeta({ title: 'Portfolio Records' });
+useMeta({ title: 'Private Company Information' });
 const search = ref('');
 const columns =
     ref([
@@ -195,25 +195,25 @@ const columns =
     ]) || [];
 
 
-const portfolioStore = usePortfolioStore();
+const privateCompanyInformationStore = usePrivateCompanyInformationStore();
 
 onMounted(() => {
-    portfolioStore.fetchPortfolioRecords();
+    privateCompanyInformationStore.fetchPrivateCompanyInformation();
 });
 const rows = computed(() =>
-    portfolioStore.portfolioRecords.map((r, i) => ({ ...r, sn: i + 1 }))
+    privateCompanyInformationStore.portfolioRecords.map((r, i) => ({ ...r, sn: i + 1 }))
 );
 const deletePortfolioRecordModal = ref(false)
 const selectPortfolioRecordId = ref(0);
 
 const deletePortfolioRecord = async () => {
-    var res = await portfolioStore.deletePortfolioRecord(selectPortfolioRecordId.value);
+    var res = await privateCompanyInformationStore.deletePrivateCompanyInformation(selectPortfolioRecordId.value);
     deletePortfolioRecordModal.value = false;
 
     if(res){
-        toast.success("Portfolio Record deleted successfully");
+        toast.success("Private Company Information deleted successfully");
     }else {
-        toast.error(portfolioStore.deletePortfolioRecordError);
+        toast.error(privateCompanyInformationStore.deletePortfolioRecordError);
     }
 
 }
@@ -228,10 +228,10 @@ const selectedFile = ref<File | null>(null);
 
 const handleFileSelected = (file: File) => {
     selectedFile.value = file;
-    portfolioStore.importErrors = []; // Clear errors when a new file is selected
+    privateCompanyInformationStore.importErrors = []; // Clear errors when a new file is selected
 };
 
-const importSector = async () => {
+const importPrivateCompanyInformation = async () => {
     if (!selectedFile.value) {
         toast.error('Please select a file first!');
         return;
@@ -240,16 +240,16 @@ const importSector = async () => {
     const formData = new FormData();
     formData.append('file', selectedFile.value);
 
-    const res = await portfolioStore.importPortfolioRecords(formData);
+    const res = await privateCompanyInformationStore.importPrivateCompanyInformation(formData);
 
     if (res) {
-        toast.success('Portfolio records imported successfully');
+        toast.success('Private Company Information imported successfully');
         importPortfolioRecordModal.value = false;
         fileUploadRef.value?.clearPreview();
         selectedFile.value = null;
-        portfolioStore.importErrors = []; // Clear errors on success
+        privateCompanyInformationStore.importErrors = []; // Clear errors on success
     } else {
-        toast.error(portfolioStore.error || 'Failed to import portfolio records');
+        toast.error(privateCompanyInformationStore.error || 'Failed to import Private Company Information');
         // Errors are already stored in sectorStore.importErrors
         fileUploadRef.value?.clickClearBtn();
         selectedFile.value = null;
@@ -258,16 +258,16 @@ const importSector = async () => {
 
 const closeModal = () => {
     importPortfolioRecordModal.value = false;
-    portfolioStore.importErrors = []; // Clear errors when closing modal
+    privateCompanyInformationStore.importErrors = []; // Clear errors when closing modal
     selectedFile.value = null; // Clear selected file
 };
 
 const downloadTemplate = async () => {
-    const res = await portfolioStore.downloadTemplate();
+    const res = await privateCompanyInformationStore.downloadTemplate();
     if (res) {
         toast.success('Template downloaded successfully');
     } else {
-        toast.error(portfolioStore.error || 'Failed to download template');
+        toast.error(privateCompanyInformationStore.error || 'Failed to download template');
     }
 }
 

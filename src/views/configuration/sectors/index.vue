@@ -41,6 +41,7 @@
                             <div>
                                 <router-link v-if="hasPermission('Edit Sector')"
                                     :to="{ name: 'sector-edit', params: { id: data.value.id } }"
+                                    @click.stop
                                     class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
                                     <IconEdit :size="20" stroke-width="1.5" />
                                 </router-link>
@@ -48,7 +49,7 @@
                             <div>
                                 <button v-if="hasPermission('Delete Sector')" type="button" v-tippy="'Delete'">
                                     <IconTrash :size="20" stroke-width="1.5"
-                                        @click="deleteSectorModal = true; selectSectorId = data.value.id" />
+                                        @click.stop="deleteSectorModal = true; selectSectorId = data.value.id" />
                                 </button>
                             </div>
                         </div>
@@ -114,7 +115,7 @@ import { useMeta } from '../../../composables/use-meta';
 import { usePermissions } from '@/composables/usePermissions';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
-import { useSectorStore } from '../../../stores/economic-and-capital-market-information/sectors';
+import { useSectorStore } from '../../../stores/configuration/sectors';
 
 import { useRouter } from 'vue-router';
 import Loader from '../../components/loader.vue';
@@ -140,7 +141,6 @@ const rows = computed(() =>
     sectorStore.sectors.map((r, i) => ({ ...r, sn: i + 1 }))
 );
 const deleteSectorModal = ref(false)
-const importSectorModal = ref(false);
 const selectSectorId = ref(0);
 
 const deleteSector = async () => {
