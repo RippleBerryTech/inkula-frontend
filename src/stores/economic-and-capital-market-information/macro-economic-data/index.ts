@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import api from '../../../plugins/axios'; // your Axios instance
 
-export const useEconomicSubmissionStore = defineStore('economic-submission', {
+export const useMacroEconomicDataStore = defineStore('macro-economic-data', {
   state: () => ({
     economicSubmissions: [] as Array<{ 
       id: number; 
@@ -44,32 +44,32 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
   }),
 
   actions: {
-    async fetchEconomicSubmissions(force = false) {
+    async fetchMacroEconomicData(force = false) {
       if (this.hasFetchedEconomicSubmissions && !force) return
       this.loading = true;
       this.error = '';
 
       try {
-        const res = await api.get('/economic-submissions/list'); // assuming your endpoint is /roles
+        const res = await api.get('/economic-and-capital-market-information/macro-economic-data/list'); // assuming your endpoint is /roles
         this.economicSubmissions = res.data.data;
         this.hasFetchedEconomicSubmissions = true     
       } catch (err: any) {
         if (err.response?.status === 401) {
-            this.error = 'You are not authorized to view economic submissions.';
+            this.error = 'You are not authorized to view macro economic data.';
         } else {
-            this.error = err.response?.data?.message || 'Failed to fetch economic submissions';
+            this.error = err.response?.data?.message || 'Failed to fetch macro economic data';
         }
       } finally {
             this.loading = false;
       }
     },
 
-    // add economic submission
-    async addEconomicSubmission(data) {
+    // add macro economic data
+    async addMacroEconomicData(data) {
       this.addEconomicSubmissionError = '';
       this.loading = true;
       try {
-        const res = await api.post('/economic-submissions/store', data);
+        const res = await api.post('/economic-and-capital-market-information/macro-economic-data/store', data);
         if (res.data.success) {
           this.economicSubmissions.push(res.data.data.economicSubmissions);
           return res.data.success;
@@ -78,19 +78,19 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
           return res.data.success;
         }
       } catch (err: any) {
-        this.addEconomicSubmissionError = err.response?.data?.message || 'Failed to add economic submission';
+        this.addEconomicSubmissionError = err.response?.data?.message || 'Failed to add macro economic data';
         return false;
       } finally {
             this.loading = false;
       }
     },
 
-    //edit economic submission
-    async editEconomicSubmission(id) {
+    //edit macro economic data
+    async editMacroEconomicData(id) {
       this.editEconomicSubmissionError = '';
       this.loading = true;
       try {
-        const res = await api.get(`/economic-submissions/edit/${id}`);
+        const res = await api.get(`/economic-and-capital-market-information/macro-economic-data/edit/${id}`);
         if (res.data.success) {
           return res.data.data;
         } else {
@@ -98,18 +98,18 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
           return res.data.success;
         }
       } catch (err: any) {
-        this.editEconomicSubmissionError = err.response?.data?.message || 'Failed to edit economic submission';
+        this.editEconomicSubmissionError = err.response?.data?.message || 'Failed to edit macro economic data';
         return false;
       } finally {
             this.loading = false;
       }
     },
-    //show economic submission
-    async showEconomicSubmission(id) {
+    //show macro economic data
+    async showMacroEconomicData(id) {
       this.editEconomicSubmissionError = '';
       this.loading = true;
       try {
-        const res = await api.get(`/economic-submissions/show/${id}`);
+        const res = await api.get(`/economic-and-capital-market-information/macro-economic-data/show/${id}`);
         if (res.data.success) {
           return res.data.data;
         } else {
@@ -117,19 +117,19 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
           return res.data.success;
         }
       } catch (err: any) {
-        this.editEconomicSubmissionError = err.response?.data?.message || 'Failed to show economic submission';
+        this.editEconomicSubmissionError = err.response?.data?.message || 'Failed to show macro economic data';
         return false;
       } finally {
             this.loading = false;
       }
     },
 
-    // update economic submission
-    async updateEconomicSubmission(data) {
+    // update macro economic data
+    async updateMacroEconomicData(data) {
       this.showEconomicSubmissionError = '';
       this.loading = true;
       try {
-        const res = await api.put(`/economic-submissions/update/${data.id}`, data);
+        const res = await api.put(`/economic-and-capital-market-information/macro-economic-data/update/${data.id}`, data);
         if (res.data.success) {
           this.economicSubmissions = this.economicSubmissions.map((role) => {
             if (role.id === data.id) {
@@ -143,19 +143,19 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
           return res.data.success;
         }
       } catch (err: any) {
-        this.showEconomicSubmissionError = err.response?.data?.message || 'Failed to update economic submission';
+        this.showEconomicSubmissionError = err.response?.data?.message || 'Failed to update macro economic data';
         return false;
       } finally {
             this.loading = false;
       }
     },
 
-    //delete economic submission
-    async deleteEconomicSubmission(id) {
+    //delete macro economic data
+    async deleteMacroEconomicData(id) {
       this.deleteEconomicSubmissionError = '';
       this.loading = true;
       try {
-        const res = await api.delete(`/economic-submissions/delete/${id}`);
+        const res = await api.delete(`/economic-and-capital-market-information/macro-economic-data/delete/${id}`);
         if (res.data.success) {
           this.economicSubmissions = this.economicSubmissions.filter((role) => role.id !== id);
           return res.data.success;
@@ -164,19 +164,19 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
           return res.data.success;
         }
       } catch (err: any) {
-        this.deleteEconomicSubmissionError = err.response?.data?.message || 'Failed to delete economic submission';
+        this.deleteEconomicSubmissionError = err.response?.data?.message || 'Failed to delete macro economic data';
         return false;
       } finally {
             this.loading = false;
       }
     },
 
-    async importEconomicSubmissions(file: FormData) {
+    async importMacroEconomicData(file: FormData) {
       this.loading = true;
       this.error = '';
       this.importErrors = []; // Clear previous errors
       try {
-        const res = await api.post('/economic-submissions/import', file, {
+        const res = await api.post('/economic-and-capital-market-information/macro-economic-data/import', file, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -193,7 +193,7 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
           return false;
         }
       } catch (err: any) {
-        this.error = err.response?.data?.message || 'Failed to import portfolio records';
+        this.error = err.response?.data?.message || 'Failed to import macro economic data';
         this.importErrors = err.response?.data?.errors || [];
         return false;
       } finally {
@@ -205,7 +205,7 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
       this.loading = true;
       this.error = '';
       try {
-        const response = await api.get('/economic-submissions/download-import-template', {
+        const response = await api.get('/economic-and-capital-market-information/macro-economic-data/download-import-template', {
           responseType: 'blob', // important for file download
         });
 
@@ -213,7 +213,7 @@ export const useEconomicSubmissionStore = defineStore('economic-submission', {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'economic_submission_template.xlsx'); // file name
+        link.setAttribute('download', 'macro-economic-data_template.xlsx'); // file name
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

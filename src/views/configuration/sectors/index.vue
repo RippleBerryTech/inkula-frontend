@@ -7,12 +7,6 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <div>
-                    <button class="btn btn-primary" v-if="hasPermission('Add Sector')" type="button"
-                        v-tippy="'Import Sectors'" @click="importSectorModal = true;">
-                        Import
-                    </button>
-                </div>
                 <router-link to="/economic-and-capital-market-information/sectors/add" v-if="hasPermission('Add Sector')"
                     class="btn btn-primary" v-tippy="'Add Sector'">Add</router-link>
             </div>
@@ -105,64 +99,6 @@
         </Dialog>
     </TransitionRoot>
 
-    <!-- Import Sector Modal -->
-    <TransitionRoot appear :show="importSectorModal" as="template">
-        <Dialog as="div" @close="closeModal" class="relative z-[51]">
-            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
-                leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
-                <DialogOverlay class="fixed inset-0 bg-[black]/60" />
-            </TransitionChild>
-
-            <div class="fixed inset-0 overflow-y-auto">
-                <div class="flex min-h-full items-start justify-center px-4 py-8">
-                    <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
-                        enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
-                        leave-to="opacity-0 scale-95">
-                        <DialogPanel
-                            class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
-                            <button type="button"
-                                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                @click="closeModal">
-                                <IconX :size="20" stroke-width="1.5" />
-                            </button>
-                            <div
-                                class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Import Sectors Data
-                            </div>
-                            <div class="p-5" v-if="importSectorModal">
-                                <FileUpload ref="fileUploadRef" :show="importSectorModal"
-                                    @file-selected="handleFileSelected" />
-
-                                <!-- Error List -->
-                                <div v-if="sectorStore.importErrors.length > 0" class="mt-4">
-                                    <p class="text-danger font-semibold">Import Errors:</p>
-                                    <ul class="list-disc list-inside text-danger">
-                                        <li v-for="error in sectorStore.importErrors" :key="error.row">
-                                            Row {{ error.row }}: {{ error.errors.join(', ') }}
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div class="flex justify-end items-center mt-8">
-                                    <button type="button" @click="closeModal"
-                                        class="btn btn-outline-danger">Cancel</button>
-                                    <button type="button" @click="downloadTemplate"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="sectorStore.loading">
-                                        {{ sectorStore.loading ? 'Downloading...' : 'Download Template' }}
-                                    </button>
-                                    <button type="button" @click="importSector"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="sectorStore.loading">
-                                        {{ sectorStore.loading ? 'Importing...' : 'Import' }}
-                                    </button>
-                                </div>
-                            </div>
-                        </DialogPanel>
-                    </TransitionChild>
-                </div>
-            </div>
-        </Dialog>
-    </TransitionRoot>
-
 
 </template>
 <script setup lang="ts">
@@ -176,13 +112,12 @@ import { computed, ref } from 'vue';
 import { useMeta } from '../../../composables/use-meta';
 
 import { usePermissions } from '@/composables/usePermissions';
-import { useSectorStore } from '../../../stores/economic-and-capital-market-information/sectors';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
-import FileUpload from '../../components/file-upload.vue';
+import { useSectorStore } from '../../../stores/economic-and-capital-market-information/sectors';
 
-import Loader from '../../components/loader.vue';
 import { useRouter } from 'vue-router';
+import Loader from '../../components/loader.vue';
 
 const { hasRole, hasPermission } = usePermissions()
 
@@ -218,55 +153,6 @@ const deleteSector = async () => {
         toast.error(sectorStore.deleteSectorError);
     }
 
-}
-// Import function
-const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
-const selectedFile = ref<File | null>(null);
-
-
-const handleFileSelected = (file: File) => {
-    selectedFile.value = file;
-    sectorStore.importErrors = []; // Clear errors when a new file is selected
-};
-
-const importSector = async () => {
-    if (!selectedFile.value) {
-        toast.error('Please select a file first!');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', selectedFile.value);
-
-    const res = await sectorStore.importSectors(formData);
-
-    if (res) {
-        toast.success('Sectors imported successfully');
-        importSectorModal.value = false;
-        fileUploadRef.value?.clearPreview();
-        selectedFile.value = null;
-        sectorStore.importErrors = []; // Clear errors on success
-    } else {
-        toast.error(sectorStore.error || 'Failed to import sectors');
-        // Errors are already stored in sectorStore.importErrors
-        fileUploadRef.value?.clickClearBtn();
-        selectedFile.value = null;
-    }
-};
-
-const closeModal = () => {
-    importSectorModal.value = false;
-    sectorStore.importErrors = []; // Clear errors when closing modal
-    selectedFile.value = null; // Clear selected file
-};
-
-const downloadTemplate = async () => {
-    const res = await sectorStore.downloadTemplate();
-    if (res) {
-        toast.success('Template downloaded successfully');
-    } else {
-        toast.error(sectorStore.error || 'Failed to download template');
-    }
 }
 
 const router = useRouter();

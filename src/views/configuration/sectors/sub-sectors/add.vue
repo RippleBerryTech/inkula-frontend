@@ -5,7 +5,7 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Add Sector</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Add Sub Sector</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">
@@ -13,15 +13,13 @@
                 <!-- name -->
                 <div class="flex-1"
                   :class="{ 'has-error': $v.form.name.$error, 'has-success': isSubmitForm && !$v.form.name.$error }">
-                  <label for="name">Sector Name</label>
-                  <input id="name" type="text" placeholder="Enter Sector Name"
-                    class="form-input" v-model="form.name" />
+                  <label for="name">Sub Sector Name</label>
+                  <input id="name" type="text" placeholder="Enter Sector Name" class="form-input" v-model="form.name" />
                   <template v-if="isSubmitForm && !$v.form.name.$error">
                     <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                   </template>
                   <template v-if="isSubmitForm && $v.form.name.$error">
-                    <p v-for="error in $v.form.name.$errors" :key="error.$uid"
-                      class="text-danger mt-1">
+                    <p v-for="error in $v.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
                       <span v-if="error.$validator === 'required'">Sector Name is required</span>
                     </p>
                   </template>
@@ -31,12 +29,13 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-and-capital-market-information/sectors/list" class="group">
+                <router-link :to="{ name: 'sub-sectors-list', params: { id: route.params.id } }" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
+
                 <div>
-                  <span v-if="!sectorStore.loading">
+                  <span v-if="!subSectorStore.loading">
                     <button type="submit" class="btn btn-primary mt-0">Add</button>
                   </span>
                   <span v-else>
@@ -47,8 +46,8 @@
                 </div>
               </div>
 
-              <div class="text-danger mt-1" v-if="sectorStore.addSectorError">{{
-                sectorStore.addSectorError }}</div>
+              <div class="text-danger mt-1" v-if="subSectorStore.addSubSectorError">{{
+                subSectorStore.addSubSectorError }}</div>
             </form>
           </div>
 
@@ -65,11 +64,18 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
-import { useMeta } from '../../../composables/use-meta';
-useMeta({ title: 'Add Sector' });
+import { useMeta } from '../../../../composables/use-meta';
+import { useRoute, useRouter } from 'vue-router';
+import { useSubSectorStore } from '@/stores/economic-and-capital-market-information/sectors/sub-sectors';
+useMeta({ title: 'Add Sub Sector' });
 // Reactive form data
+
+const route = useRoute()
+const router = useRouter()
+
 const form = reactive({
   name: '',
+  sector_id: route.params.id
 })
 
 // Validation rules
@@ -90,7 +96,7 @@ const submitForm = async () => {
 
   if (!$v.value.$invalid) {
 
-    const res = await sectorStore.addSector(form)
+    const res = await subSectorStore.addSubSector(form)
     if (res) {
       // Reset form
       form.name = '',
@@ -99,7 +105,10 @@ const submitForm = async () => {
         $v.value.$reset()
       isSubmitForm.value = false
 
-      await appRouter.push('/economic-and-capital-market-information/sectors/list')
+      await appRouter.push({
+        name: 'sub-sectors-list',
+        params: { id: route.params.id }
+      })
       // Show success message
       toast.success("Sector added successfully")
     }
@@ -108,7 +117,7 @@ const submitForm = async () => {
   }
 }
 
-const sectorStore = useSectorStore();
+const subSectorStore = useSubSectorStore();
 
 onMounted(() => {
 })

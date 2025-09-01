@@ -5,7 +5,7 @@
                 <!-- Basic -->
                 <div class="panel">
                     <div class="flex items-center justify-between mb-5">
-                        <h5 class="font-semibold text-lg dark:text-white-light">Economic Submission Details</h5>
+                        <h5 class="font-semibold text-lg dark:text-white-light">Capital Market Data Details</h5>
                     </div>
                     <div class="space-y-8">
                         <!-- Investment Funds -->
@@ -110,7 +110,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end items-center mt-8 space-x-4">
-                        <router-link to="/economic-and-capital-market-information/economic-submissions/list" class="group">
+                        <router-link :to="{name: 'capital-market-data-list'}" class="group">
                             <button type="button" class="btn btn-outline-danger">Back</button>
                         </router-link>
                     </div>
@@ -121,13 +121,13 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { useEconomicSubmissionStore } from '@/stores/economic-and-capital-market-information/economic-submissions';
+import { useCapitalMarketDataStore } from '@/stores/economic-and-capital-market-information/capital-market-data';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import { onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
-useMeta({ title: 'Edit Economic Submission' });
+useMeta({ title: 'Edit Capital Market Data' });
 
 const route = useRoute()
 const router = useRouter()
@@ -160,14 +160,14 @@ const form = reactive({
 
 
 
-const economicSubmissionStore = useEconomicSubmissionStore();
+const capitalMarketDataStore = useCapitalMarketDataStore();
 
 onMounted(async () => {
     const economicSubmissionId = route.params.id
-    economicSubmissionStore.showEconomicSubmissionError = ''
+    capitalMarketDataStore.showEconomicSubmissionError = ''
 
     // fetch the role directly from API
-    const economicSubmission = await economicSubmissionStore.showEconomicSubmission(economicSubmissionId)
+    const economicSubmission = await capitalMarketDataStore.showCapitalMarketData(economicSubmissionId)
 
     if (economicSubmission) {
         form.id = economicSubmission.id.toString()
@@ -189,8 +189,10 @@ onMounted(async () => {
         form.government_bond_rate_15_year = economicSubmission.government_bond_rate_15_year
         form.inflation = economicSubmission.inflation
     } else {
-        await router.push('/economic-and-capital-market-information/economic-submissions/list')
-        toast.error(economicSubmissionStore.showEconomicSubmissionError || 'Economic Submission not found')
+         await router.push({
+            name: 'capital-market-data-list',
+        })
+        toast.error(capitalMarketDataStore.showEconomicSubmissionError || 'Capital Market Data not found')
     }
 })
 

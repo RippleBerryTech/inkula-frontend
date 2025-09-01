@@ -95,36 +95,65 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
-        path: '/economic-and-capital-market-information/economic-submissions',
-        component: RouterView,                // wrapper that renders the children
+        path: '/economic-and-capital-market-information/macro-economic-data',
+        component: RouterView,   // ✅ correct usage              // wrapper that renders the children
         meta: { requiresAuth: true },
         children: [
             {
                 path: 'list',
-                name: 'economic-submissions-list',
-                component: () => import('../../src/views/economic-and-capital-market-information/economic-submissions/index.vue'),
+                name: 'macro-economic-data-list',
+                component: () => import('../../src/views/economic-and-capital-market-information/macro-economic-data/index.vue'),
             },
             {
                 path: 'add',
-                name: 'economic-submission-add',
-                component: () => import('../../src/views/economic-and-capital-market-information/economic-submissions/add.vue'),
+                name: 'macro-economic-data-add',
+                component: () => import('../../src/views/economic-and-capital-market-information/macro-economic-data/add.vue'),
             },
             {
                 path: ':id/edit',
-                name: 'economic-submission-edit',
+                name: 'macro-economic-data-edit',
                 props: true,
-                component: () => import('../../src/views/economic-and-capital-market-information/economic-submissions/edit.vue'),
+                component: () => import('../../src/views/economic-and-capital-market-information/macro-economic-data/edit.vue'),
             },
             {
                 path: ':id/show',
-                name: 'economic-submission-show',
+                name: 'macro-economic-data-show',
                 props: true,
-                component: () => import('../../src/views/economic-and-capital-market-information/economic-submissions/show.vue'),
+                component: () => import('../../src/views/economic-and-capital-market-information/macro-economic-data/show.vue'),
             },
         ],
     },
     {
-        path: '/economic-and-capital-market-information/sectors',
+        path: '/economic-and-capital-market-information/capital-market-data',
+        component: RouterView,   // ✅ correct usage                // wrapper that renders the children
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'list',
+                name: 'capital-market-data-list',
+                component: () => import('../../src/views/economic-and-capital-market-information/capital-market-data/index.vue'),
+            },
+            {
+                path: 'add',
+                name: 'capital-market-data-add',
+                component: () => import('../../src/views/economic-and-capital-market-information/capital-market-data/add.vue'),
+            },
+            {
+                path: ':id/edit',
+                name: 'capital-market-data-edit',
+                props: true,
+                component: () => import('../../src/views/economic-and-capital-market-information/capital-market-data/edit.vue'),
+            },
+            {
+                path: ':id/show',
+                name: 'capital-market-data-show',
+                props: true,
+                component: () => import('../../src/views/economic-and-capital-market-information/capital-market-data/show.vue'),
+            },
+        ],
+    },
+    {
+        path: '/configuration/sectors',
         component: RouterView, // wrapper that renders the children
         meta: { requiresAuth: true },
         children: [
@@ -132,67 +161,89 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'list',
                 name: 'sectors-list',
-                component: () => import('../../src/views/economic-and-capital-market-information/sectors/index.vue'),
+                component: () => import('../../src/views/configuration/sectors/index.vue'),
             },
             {
                 path: 'add',
                 name: 'sector-add',
-                component: () => import('../../src/views/economic-and-capital-market-information/sectors/add.vue'),
+                component: () => import('../../src/views/configuration/sectors/add.vue'),
             },
             {
                 path: ':id/edit',
                 name: 'sector-edit',
                 props: true,
-                component: () => import('../../src/views/economic-and-capital-market-information/sectors/edit.vue'),
+                component: () => import('../../src/views/configuration/sectors/edit.vue'),
             },
             // --- SubSector Routes (nested inside a Sector) ---
             {
                 path: ':id/sub-sectors',
                 component: RouterView, // nested wrapper for subsectors
-                props: true,
                 children: [
                     {
                         path: 'list',
                         name: 'sub-sectors-list',
                         props: true,
-                        component: () => import('../../src/views/economic-and-capital-market-information/sectors/sub-sectors/index.vue'),
+                        component: () => import('../../src/views/configuration/sectors/sub-sectors/index.vue'),
                     },
                     {
                         path: 'add',
                         name: 'sub-sector-add',
                         props: true,
-                        component: () => import('../../src/views/economic-and-capital-market-information/sectors/sub-sectors/add.vue'),
+                        component: () => import('../../src/views/configuration/sectors/sub-sectors/add.vue'),
                     },
                     {
                         path: ':sub_sector/edit',
                         name: 'sub-sector-edit',
                         props: true,
-                        component: () => import('../../src/views/economic-and-capital-market-information/sectors/sub-sectors/edit.vue'),
+                        component: () => import('../../src/views/configuration/sectors/sub-sectors/edit.vue'),
                     },
                 ],
             },
         ],
     },
     {
-        path: '/economic-and-capital-market-information/portfolio-records',
+        path: '/configuration/portfolio-record/listed-company-information',
         component: RouterView,                // wrapper that renders the children
         meta: { requiresAuth: true },
         children: [
             {
                 path: 'list',
-                name: 'portfolio-records-list',
-                component: () => import('../../src/views/economic-and-capital-market-information/portfolio-records/index.vue'),
+                name: 'listed-company-information-list',
+                component: () => import('../../src/views/configuration/portfolio-record/listed-company-information/index.vue'),
             },
             {
                 path: 'add',
-                name: 'portfolio-record-add',
-                component: () => import('../../src/views/economic-and-capital-market-information/portfolio-records/add.vue'),
+                name: 'listed-company-information-add',
+                component: () => import('../../src/views/configuration/portfolio-record/listed-company-information/add.vue'),
             },
             {
                 path: ':id/edit',
-                name: 'portfolio-record-edit',
+                name: 'listed-company-information-edit',
                 props: true,
-                component: () => import('../../src/views/economic-and-capital-market-information/portfolio-records/edit.vue'),
+                component: () => import('../../src/views/configuration/portfolio-record/listed-company-information/edit.vue'),
+            },
+        ],
+    },
+    {
+        path: '/configuration/portfolio-record/private-company-information',
+        component: RouterView,                // wrapper that renders the children
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'list',
+                name: 'private-company-information-list',
+                component: () => import('../../src/views/configuration/portfolio-record/private-company-information/index.vue'),
+            },
+            {
+                path: 'add',
+                name: 'private-company-information-add',
+                component: () => import('../../src/views/configuration/portfolio-record/private-company-information/add.vue'),
+            },
+            {
+                path: ':id/edit',
+                name: 'private-company-information-edit',
+                props: true,
+                component: () => import('../../src/views/configuration/portfolio-record/private-company-information/edit.vue'),
             },
         ],
     },

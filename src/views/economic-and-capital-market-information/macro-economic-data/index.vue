@@ -3,28 +3,28 @@
 
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Portfolio Record List</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Macro Economic Data</h5>
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
                 <div>
-                    <button class="btn btn-primary" v-if="hasPermission('Add Portfolio Record')" type="button"
-                        v-tippy="'Import Portfolio Records'" @click="importPortfolioRecordModal = true;">
+                    <button class="btn btn-primary" v-if="hasPermission('Add Economic Submission')" type="button"
+                        v-tippy="'Import Economic Submission'" @click="importEconomicSubmissionModal = true;">
                         Import
                     </button>
                 </div>
-                <router-link to="/economic-and-capital-market-information/portfolio-records/add" v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary">Add</router-link>
+                <router-link v-tippy="'Add Economic Submission'" to="/economic-and-capital-market-information/macro-economic-data/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add</router-link>
             </div>
 
             <div class="datatable">
                 <!-- Loading Spinner -->
-                <Loader v-if="portfolioStore.loading" size="64" color="#4361ee" />
+                <Loader v-if="macroEconomicDataStore.loading" size="64" color="#4361ee" />
                 <!-- Error -->
-                <div v-else-if="portfolioStore.error" class="text-red-500 text-center py-4">
-                    {{ portfolioStore.error }}
+                <div v-else-if="macroEconomicDataStore.error" class="text-red-500 text-center py-4">
+                    {{ macroEconomicDataStore.error }}
                 </div>
                 <!-- DataTable -->
-                <vue3-datatable v-else :rows="portfolioStore.portfolioRecords" :columns="columns" :totalRows="portfolioStore.portfolioRecords?.length"
+                <vue3-datatable v-else :rows="macroEconomicDataStore.economicSubmissions" :columns="columns" :totalRows="macroEconomicDataStore.economicSubmissions?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
                     firstArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 17h6l-4 -5l4 -5h-6l-4 5z" /></svg>' 
                     lastArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-6l4 5l-4 5h6l4 -5z" /></svg>' 
@@ -35,27 +35,58 @@
                             {{rows.findIndex(r => r.id === data.value.id) + 1}}
                         </div>
                     </template>
-                    <template #name="data">
+                    <template #mpile_high_yield_debt_fund="data">
                         <div class="flex items-center w-max">
-                            {{ data.value.name }}
+                            {{ data.value.mpile_high_yield_debt_fund }}
                         </div>
                     </template>
-                    <template #website="data">
+                    <template #mpile_money_market_fund="data">
                         <div class="flex items-center w-max">
-                            {{ data.value.website ?? "N/A"}}
+                            {{ data.value.mpile_money_market_fund }}
+                        </div>
+                    </template>
+                    <template #mpile_local_equity_fund="data">
+                        <div class="flex items-center w-max">
+                            {{ data.value.mpile_local_equity_fund }}
+                        </div>
+                    </template>
+                    <template #mpile_offshore_equity_fund="data">
+                        <div class="flex items-center w-max">
+                            {{ data.value.mpile_offshore_equity_fund }}
+                        </div>
+                    </template>
+                    <template #mpile_property_fund="data">
+                        <div class="flex items-center w-max">
+                            {{ data.value.mpile_property_fund }}
+                        </div>
+                    </template>
+                    <template #average_zmw_per_usd="data">
+                        <div class="flex items-center w-max">
+                            {{ data.value.average_zmw_per_usd }}
+                        </div>
+                    </template>
+                    <template #inflation="data">
+                        <div class="flex items-center w-max">
+                            {{ data.value.inflation }}
                         </div>
                     </template>
                     <template #action="data">
                         <div class="flex items-center">
                             <div>
-                                <router-link v-if="hasPermission('Edit Portfolio Record')" :to="{ name: 'portfolio-record-edit', params: { id: data.value.id } }"
+                                <router-link v-if="hasPermission('View Economic Submission')" :to="{ name: 'macro-economic-data-show', params: { id: data.value.id } }"
+                                    class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'View Details'">
+                                    <IconEye :size="20" stroke-width="1.5" />
+                                </router-link>
+                            </div>
+                            <div>
+                                <router-link v-if="hasPermission('Edit Economic Submission')" :to="{ name: 'macro-economic-data-edit', params: { id: data.value.id } }"
                                     class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
                                     <IconEdit :size="20" stroke-width="1.5" />
                                 </router-link>
                             </div>
                             <div>
-                                <button v-if="hasPermission('Delete Portfolio Record')" type="button" v-tippy="'Delete'">
-                                    <IconTrash :size="20" stroke-width="1.5"  @click="deletePortfolioRecordModal = true; selectPortfolioRecordId = data.value.id"/>
+                                <button v-if="hasPermission('Delete Economic Submission')" type="button" v-tippy="'Delete'">
+                                    <IconTrash :size="20" stroke-width="1.5"  @click="deleteEconomicSubmissionModal = true; selectEconomicSubmissionId = data.value.id"/>
                                 </button>
                             </div>
                         </div>
@@ -65,9 +96,9 @@
         </div>
     </div>
 
-    <!-- Delete Portfolio Record Modal -->
-    <TransitionRoot appear :show="deletePortfolioRecordModal" as="template">
-        <Dialog as="div" @close="deletePortfolioRecordModal = false" class="relative z-[51]">
+    <!-- Delete Economic Submission Modal -->
+    <TransitionRoot appear :show="deleteEconomicSubmissionModal" as="template">
+        <Dialog as="div" @close="deleteEconomicSubmissionModal = false" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -82,7 +113,7 @@
                             class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
                             <button type="button"
                                 class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                @click="deletePortfolioRecordModal = false">
+                                @click="deleteEconomicSubmissionModal = false">
                                 <IconX :size="20" stroke-width="1.5" />
                             </button>
                             <div
@@ -90,12 +121,12 @@
                                 Confirm your action!
                             </div>
                             <div class="p-5">
-                                <span class="text-gray-500">Are you sure you want to delete this portfolio record?</span>
+                                <span class="text-gray-500">Are you sure you want to delete this economic submission?</span>
 
                                 <div class="flex justify-end items-center mt-8">
-                                    <button type="button" @click="deletePortfolioRecordModal = false"
+                                    <button type="button" @click="deleteEconomicSubmissionModal = false"
                                         class="btn btn-outline-danger">Cancel</button>
-                                    <button type="button" @click="deletePortfolioRecord"
+                                    <button type="button" @click="deleteEconomicSubmission"
                                         class="btn btn-primary ltr:ml-4 rtl:mr-4">Delete</button>
                                 </div>
                             </div>
@@ -107,7 +138,7 @@
     </TransitionRoot>
 
     <!-- Import Portfolio Record Modal -->
-    <TransitionRoot appear :show="importPortfolioRecordModal" as="template">
+    <TransitionRoot appear :show="importEconomicSubmissionModal" as="template">
         <Dialog as="div" @close="closeModal" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
@@ -128,17 +159,17 @@
                             </button>
                             <div
                                 class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Portfolio Records Data
+                                Select File to Macro Economic Data
                             </div>
-                            <div class="p-5" v-if="importPortfolioRecordModal">
-                                <FileUpload ref="fileUploadRef" :show="importPortfolioRecordModal"
+                            <div class="p-5" v-if="importEconomicSubmissionModal">
+                                <FileUpload ref="fileUploadRef" :show="importEconomicSubmissionModal"
                                     @file-selected="handleFileSelected" />
 
                                 <!-- Error List -->
-                                <div v-if="portfolioStore.importErrors.length > 0" class="mt-4">
+                                <div v-if="macroEconomicDataStore.importErrors.length > 0" class="mt-4">
                                     <p class="text-danger font-semibold">Import Errors:</p>
                                     <ul class="list-disc list-inside text-danger">
-                                        <li v-for="error in portfolioStore.importErrors" :key="error.row">
+                                        <li v-for="error in macroEconomicDataStore.importErrors" :key="error.row">
                                             Row {{ error.row }}: {{ error.errors.join(', ') }}
                                         </li>
                                     </ul>
@@ -146,14 +177,14 @@
 
                                 <div class="flex justify-end items-center mt-8">
                                     <button type="button" @click="closeModal"
-                                        class="btn btn-outline-danger">Cancel</button>
+                                        class="btn btn-outline-danger">Back</button>
                                     <button type="button" @click="downloadTemplate"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="portfolioStore.loading">
-                                        {{ portfolioStore.loading ? 'Downloading...' : 'Download Template' }}
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="macroEconomicDataStore.loading">
+                                        {{ macroEconomicDataStore.loading ? 'Downloading...' : 'Download Template' }}
                                     </button>
                                     <button type="button" @click="importSector"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="portfolioStore.loading">
-                                        {{ portfolioStore.loading ? 'Importing...' : 'Import' }}
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="macroEconomicDataStore.loading">
+                                        {{ macroEconomicDataStore.loading ? 'Importing...' : 'Import' }}
                                     </button>
                                 </div>
                             </div>
@@ -168,7 +199,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -176,50 +207,56 @@ import { computed, ref } from 'vue';
 import { useMeta } from '../../../composables/use-meta';
 
 import { usePermissions } from '@/composables/usePermissions';
-import { usePortfolioStore } from '@/stores/economic-and-capital-market-information/portfolio-record';
 import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import FileUpload from '../../components/file-upload.vue';
 
 import Loader from '../../components/loader.vue';
+import { useCapitalMarketDataStore } from '@/stores/economic-and-capital-market-information/capital-market-data';
 const { hasRole, hasPermission } = usePermissions()
 
-useMeta({ title: 'Portfolio Records' });
+useMeta({ title: 'Macro Economic Data' });
 const search = ref('');
 const columns =
     ref([
         { field: 'id', title: '#' },
-        { field: 'name', title: 'Name' },
-        { field: 'website', title: 'Website' },
+        { field: 'mpile_high_yield_debt_fund', title: 'Mpile High Yield Debt Fund' },
+        { field: 'mpile_money_market_fund', title: 'Mpile Money Market Fund' },
+        { field: 'mpile_local_equity_fund', title: 'Mpile Local Equity Fund' },
+        { field: 'mpile_offshore_equity_fund', title: 'Mpile Offshore Equity Fund' },
+        { field: 'mpile_property_fund', title: 'Mpile Property Fund' },
+        { field: 'average_zmw_per_usd', title: 'Mpile Average ZMW Per USD' },
+        { field: 'inflation', title: 'Inflation' },
         { field: 'action', title: 'Action', sort: false },
     ]) || [];
 
 
-const portfolioStore = usePortfolioStore();
+const macroEconomicDataStore = useCapitalMarketDataStore();
 
 onMounted(() => {
-    portfolioStore.fetchPortfolioRecords();
+    macroEconomicDataStore.fetchCapitalMarketData();
 });
 const rows = computed(() =>
-    portfolioStore.portfolioRecords.map((r, i) => ({ ...r, sn: i + 1 }))
+    macroEconomicDataStore.economicSubmissions.map((r, i) => ({ ...r, sn: i + 1 }))
 );
-const deletePortfolioRecordModal = ref(false)
-const selectPortfolioRecordId = ref(0);
+const deleteEconomicSubmissionModal = ref(false)
+const selectEconomicSubmissionId = ref(0);
 
-const deletePortfolioRecord = async () => {
-    var res = await portfolioStore.deletePortfolioRecord(selectPortfolioRecordId.value);
-    deletePortfolioRecordModal.value = false;
+const deleteEconomicSubmission = async () => {
+    var res = await macroEconomicDataStore.deleteCapitalMarketData(selectEconomicSubmissionId.value);
+    deleteEconomicSubmissionModal.value = false;
 
     if(res){
-        toast.success("Portfolio Record deleted successfully");
+        toast.success("Capital Market Data deleted successfully");
     }else {
-        toast.error(portfolioStore.deletePortfolioRecordError);
+        toast.error(macroEconomicDataStore.deleteEconomicSubmissionError);
     }
 
 }
 
 
-const importPortfolioRecordModal = ref(false);
+
+const importEconomicSubmissionModal = ref(false);
 
 // Import function
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
@@ -228,7 +265,7 @@ const selectedFile = ref<File | null>(null);
 
 const handleFileSelected = (file: File) => {
     selectedFile.value = file;
-    portfolioStore.importErrors = []; // Clear errors when a new file is selected
+    macroEconomicDataStore.importErrors = []; // Clear errors when a new file is selected
 };
 
 const importSector = async () => {
@@ -240,36 +277,36 @@ const importSector = async () => {
     const formData = new FormData();
     formData.append('file', selectedFile.value);
 
-    const res = await portfolioStore.importPortfolioRecords(formData);
+    const res = await macroEconomicDataStore.importCapitalMarketData(formData);
 
     if (res) {
-        toast.success('Portfolio records imported successfully');
-        importPortfolioRecordModal.value = false;
+        toast.success('Capital Market Data imported successfully');
+        importEconomicSubmissionModal.value = false;
         fileUploadRef.value?.clearPreview();
         selectedFile.value = null;
-        portfolioStore.importErrors = []; // Clear errors on success
+        macroEconomicDataStore.importErrors = []; // Clear errors on success
     } else {
-        toast.error(portfolioStore.error || 'Failed to import portfolio records');
+        toast.error(macroEconomicDataStore.error || 'Failed to import Capital Market Data');
         // Errors are already stored in sectorStore.importErrors
         fileUploadRef.value?.clickClearBtn();
         selectedFile.value = null;
     }
 };
 
-const closeModal = () => {
-    importPortfolioRecordModal.value = false;
-    portfolioStore.importErrors = []; // Clear errors when closing modal
-    selectedFile.value = null; // Clear selected file
-};
-
 const downloadTemplate = async () => {
-    const res = await portfolioStore.downloadTemplate();
+    const res = await macroEconomicDataStore.downloadTemplate();
     if (res) {
         toast.success('Template downloaded successfully');
     } else {
-        toast.error(portfolioStore.error || 'Failed to download template');
+        toast.error(macroEconomicDataStore.error || 'Failed to download template');
     }
 }
+
+const closeModal = () => {
+    importEconomicSubmissionModal.value = false;
+    macroEconomicDataStore.importErrors = []; // Clear errors when closing modal
+    selectedFile.value = null; // Clear selected file
+};
 
 </script>
 

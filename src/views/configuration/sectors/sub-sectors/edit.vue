@@ -5,7 +5,7 @@
         <!-- Basic -->
         <div class="panel">
           <div class="flex items-center justify-between mb-5">
-            <h5 class="font-semibold text-lg dark:text-white-light">Edit Sector</h5>
+            <h5 class="font-semibold text-lg dark:text-white-light">Edit Sub Sector</h5>
           </div>
           <div class="mb-5">
             <form class="space-y-5" @submit.prevent="submitForm">
@@ -14,14 +14,12 @@
                 <div class="flex-1"
                   :class="{ 'has-error': $v.form.name.$error, 'has-success': isSubmitForm && !$v.form.name.$error }">
                   <label for="name">Sector Name</label>
-                  <input id="name" type="text" placeholder="Enter Sector Name"
-                    class="form-input" v-model="form.name" />
+                  <input id="name" type="text" placeholder="Enter Sector Name" class="form-input" v-model="form.name" />
                   <template v-if="isSubmitForm && !$v.form.name.$error">
                     <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                   </template>
                   <template v-if="isSubmitForm && $v.form.name.$error">
-                    <p v-for="error in $v.form.name.$errors" :key="error.$uid"
-                      class="text-danger mt-1">
+                    <p v-for="error in $v.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
                       <span v-if="error.$validator === 'required'">Sector Name is required</span>
                     </p>
                   </template>
@@ -31,12 +29,13 @@
 
 
               <div class="flex justify-end items-center mt-8 space-x-4">
-                <router-link to="/economic-and-capital-market-information/sectors/list" class="group">
+                <router-link :to="{ name: 'sub-sectors-list', params: { id: route.params.id } }" class="group">
                   <button type="button" class="btn btn-outline-danger">Cancel</button>
                 </router-link>
 
+
                 <div>
-                  <span v-if="!sectorStore.loading">
+                  <span v-if="!subSectorStore.loading">
                     <button type="submit" class="btn btn-primary mt-0">Update</button>
                   </span>
                   <span v-else>
@@ -47,8 +46,8 @@
                 </div>
               </div>
 
-              <div class="text-danger mt-1" v-if="sectorStore.editSectorError">{{
-                sectorStore.editSectorError }}</div>
+              <div class="text-danger mt-1" v-if="subSectorStore.editSubSectorError">{{
+                subSectorStore.editSubSectorError }}</div>
             </form>
           </div>
 
@@ -59,7 +58,7 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
-import { useSectorStore } from '@/stores/economic-and-capital-market-information/sectors';
+import { useSubSectorStore } from '@/stores/economic-and-capital-market-information/sectors/sub-sectors';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -67,14 +66,17 @@ import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../../composables/use-meta';
-useMeta({ title: 'Edit Sector' });
+
+useMeta({ title: 'Edit Sub-Sector' });
 
 const route = useRoute()
 const router = useRouter()
+
 // Reactive form data
 const form = reactive({
   id: '',
   name: '',
+  sector_id: '' // keep track of parent sector id
 })
 
 // Validation rules
@@ -88,48 +90,52 @@ const rules = {
 const isSubmitForm = ref(false)
 const $v = useVuelidate(rules, { form })
 
-// Form submit handler
+const subSectorStore = useSubSectorStore()
 
+// Form submit handler
 const submitForm = async () => {
   isSubmitForm.value = true
   await $v.value.$validate()
 
   if (!$v.value.$invalid) {
+    const ok = await subSectorStore.updateSubSector({
+      id: Number(form.id),
+      name: form.name,
+      sector_id: Number(form.sector_id)
+    })
 
-    const ok = await sectorStore.updateSector({
-    id: Number(form.id),
-    name: form.name,
-  })
-
-  if (ok) {
-    await appRouter.push('/economic-and-capital-market-information/sectors/list')
-    toast.success('Sector updated successfully')
-  } else {
-    toast.error(sectorStore.editSectorError)
-  }
-
+    if (ok) {
+      await appRouter.push({
+        name: 'sub-sectors-list',
+        params: { id: form.sector_id }
+      })
+      toast.success('Sub-Sector updated successfully')
+    } else {
+      toast.error(subSectorStore.editSubSectorError)
+    }
   } else {
     toast.error('Validation Failed')
   }
 }
 
-const sectorStore = useSectorStore();
-
 onMounted(async () => {
   const sectorId = route.params.id
-  sectorStore.editSectorError = ''
+  const subSectorId = route.params.sub_sector
 
-  // fetch the role directly from API
-  const sector = await sectorStore.editsector(sectorId)
+  console.log('Sector ID:', sectorId);
+  console.log('Sub-Sector ID:', subSectorId);
+  subSectorStore.editSubSectorError = ''
 
-  if (sector) {
-    form.id = sector.id.toString()
-    form.name = sector.name
+  // fetch sub-sector from API
+  const subSector = await subSectorStore.editSubSector(sectorId, subSectorId)
+
+  if (subSector) {
+    form.id = subSector.id.toString()
+    form.name = subSector.name
+    form.sector_id = sectorId.toString()
   } else {
-    await router.push('/economic-and-capital-market-information/sectors/list')
-    toast.error(sectorStore.editSectorError || 'Sector not found')
+    await router.push({ name: 'sub-sectors-list', params: { id: sectorId } })
+    toast.error(subSectorStore.editSubSectorError || 'Sub-Sector not found')
   }
 })
-
-
 </script>

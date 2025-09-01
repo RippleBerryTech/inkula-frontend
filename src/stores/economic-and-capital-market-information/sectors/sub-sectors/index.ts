@@ -1,40 +1,41 @@
 import { defineStore } from 'pinia';
-import api from '../../../plugins/axios'; // your Axios instance
+import api from '../../../../plugins/axios'; // your Axios instance
 
-export const useSectorStore = defineStore('sector', {
+export const useSubSectorStore = defineStore('sub-sector', {
   state: () => ({
     sectors: [] as Array<{ 
       id: number;
       name: string,
+      sector_id: number,
     }>,
     
     loading: false,
 
     error: '',
-    addSectorError : '',
-    editSectorError : '',
-    deleteSectorError: '',
+    addSubSectorError : '',
+    editSubSectorError : '',
+    deleteSubSectorError: '',
 
-    importErrors: [] as Array<{ row: number; attribute: string; errors: string[] }>,
+    // importErrors: [] as Array<{ row: number; attribute: string; errors: string[] }>,
     /* NEW - cache flag */
     hasFetchedSectors: false
   }),
 
   actions: {
-    async fetchSectors(force = false) {
+    async fetchSubSectors(force = false, id: any) {
       if (this.hasFetchedSectors && !force) return
       this.loading = true;
       this.error = '';
 
       try {
-        const res = await api.get('/sectors/list'); // assuming your endpoint is /roles
+        const res = await api.get('/sectors/'+id+'/sub-sectors/list'); // assuming your endpoint is /roles
         this.sectors = res.data.data;
         this.hasFetchedSectors = true     
       } catch (err: any) {
         if (err.response?.status === 401) {
-            this.error = 'You are not authorized to view sectors.';
+            this.error = 'You are not authorized to view sub sectors.';
         } else {
-            this.error = err.response?.data?.message || 'Failed to fetch sectors';
+            this.error = err.response?.data?.message || 'Failed to fetch sub sectors';
         }
       } finally {
             this.loading = false;
@@ -42,20 +43,20 @@ export const useSectorStore = defineStore('sector', {
     },
 
     // add sector
-    async addSector(data) {
-      this.addSectorError = '';
+    async addSubSector(data) {
+      this.addSubSectorError = '';
       this.loading = true;
       try {
-        const res = await api.post('/sectors/store', data);
+        const res = await api.post('/sectors/'+data.sector_id+'/sub-sectors/store', data);
         if (res.data.success) {
           this.sectors.push(res.data.data.sectors);
           return res.data.success;
         } else {
-          this.addSectorError = res.data.message;
+          this.addSubSectorError = res.data.message;
           return res.data.success;
         }
       } catch (err: any) {
-        this.addSectorError = err.response?.data?.message || 'Failed to add sector';
+        this.addSubSectorError = err.response?.data?.message || 'Failed to add sector';
         return false;
       } finally {
             this.loading = false;
@@ -63,19 +64,22 @@ export const useSectorStore = defineStore('sector', {
     },
 
     //edit sector
-    async editsector(id) {
-      this.editSectorError = '';
+    async editSubSector(id, sub_sector_id) {
+      this.editSubSectorError = '';
       this.loading = true;
       try {
-        const res = await api.get(`/sectors/edit/${id}`);
+        var url = `/sectors/`+id +`/sub-sectors/edit/${sub_sector_id}`;
+        console.log(url);
+        const res = await api.get(url);
+        console.log(JSON.stringify(res.data, null, 2));
         if (res.data.success) {
           return res.data.data;
         } else {
-          this.editSectorError = res.data.message;
+          this.editSubSectorError = res.data.message;
           return res.data.success;
         }
       } catch (err: any) {
-        this.editSectorError = err.response?.data?.message || 'Failed to edit sector';
+        this.editSubSectorError = err.response?.data?.message || 'Failed to edit sector';
         return false;
       } finally {
             this.loading = false;
@@ -83,26 +87,26 @@ export const useSectorStore = defineStore('sector', {
     },
 
     // update sector
-    async updateSector(data) {
-      this.editSectorError = '';
+    async updateSubSector(data) {
+      this.editSubSectorError = '';
       this.loading = true;
       try {
-        const res = await api.put(`/sectors/update/${data.id}`, data);
+        const res = await api.put(`/sectors/`+data.sector_id+`/sub-sectors/update/${data.id}`, data);
         console.log(res);
         if (res.data.success) {
-          this.sectors = this.sectors.map((role) => {
-            if (role.id === data.id) {
+          this.sectors = this.sectors.map((data) => {
+            if (data.id === data.id) {
               return res.data.data.sector;
             }
-            return role;
+            return data;
           });
           return res.data.success;
         } else {
-          this.editSectorError = res.data.message;
+          this.editSubSectorError = res.data.message;
           return res.data.success;
         }
       } catch (err: any) {
-        this.editSectorError = err.response?.data?.message || 'Failed to update sector';
+        this.editSubSectorError = err.response?.data?.message || 'Failed to update sub sector';
         return false;
       } finally {
             this.loading = false;
@@ -110,20 +114,20 @@ export const useSectorStore = defineStore('sector', {
     },
 
     //delete sector
-    async deleteSector(id) {
-      this.deleteSectorError = '';
+    async deleteSubSector(id, sub_sector_id) {
+      this.deleteSubSectorError = '';
       this.loading = true;
       try {
-        const res = await api.delete(`/sectors/delete/${id}`);
+        const res = await api.delete(`/sectors/`+id+`/sub-sectors/delete/${sub_sector_id}`);
         if (res.data.success) {
-          this.sectors = this.sectors.filter((role) => role.id !== id);
+          this.sectors = this.sectors.filter((data) => data.id !== id);
           return res.data.success;
         } else {
-          this.deleteSectorError = res.data.message;
+          this.deleteSubSectorError = res.data.message;
           return res.data.success;
         }
       } catch (err: any) {
-        this.deleteSectorError = err.response?.data?.message || 'Failed to delete sector';
+        this.deleteSubSectorError = err.response?.data?.message || 'Failed to delete sub sector';
         return false;
       } finally {
             this.loading = false;
