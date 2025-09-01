@@ -100,7 +100,7 @@
                                 Confirm your action!
                             </div>
                             <div class="p-5">
-                                <span class="text-gray-500">Are you sure you want to delete this user?</span>
+                                <span class="text-gray-500">Are you sure you want to delete this?</span>
 
                                 <div class="flex justify-end items-center mt-8">
                                     <button type="button" @click="deleteUserModal = false"
@@ -121,7 +121,7 @@
     import Vue3Datatable from '@bhplugin/vue3-datatable';
 
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconTrash, IconX, IconDatabaseOff } from '@tabler/icons-vue';
+import { IconDatabaseOff, IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
 import { computed, ref } from 'vue';
 import { useMeta } from '../../../composables/use-meta';
 

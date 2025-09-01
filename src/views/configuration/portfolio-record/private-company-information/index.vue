@@ -95,7 +95,7 @@
                                 Confirm your action!
                             </div>
                             <div class="p-5">
-                                <span class="text-gray-500">Are you sure you want to delete this private company information?</span>
+                                <span class="text-gray-500">Are you sure you want to delete this?</span>
 
                                 <div class="flex justify-end items-center mt-8">
                                     <button type="button" @click="deletePortfolioRecordModal = false"
