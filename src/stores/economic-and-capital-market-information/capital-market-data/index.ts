@@ -172,8 +172,6 @@ export const useCapitalMarketDataStore = defineStore('capital-market-data', {
     },
 
     async importCapitalMarketData(file: FormData) {
-      this.loading = true;
-      this.error = '';
       this.importErrors = []; // Clear previous errors
       try {
         const res = await api.post('/economic-and-capital-market-information/capital-market-data/import', file, {
@@ -188,12 +186,10 @@ export const useCapitalMarketDataStore = defineStore('capital-market-data', {
           this.economicSubmissions = res.data.data.capitalMarketData;
           return res.data.success;
         } else {
-          this.error = res.data.message;
           this.importErrors = res.data.errors || []; // Store errors
           return false;
         }
       } catch (err: any) {
-        this.error = err.response?.data?.message || 'Failed to import portfolio records';
         this.importErrors = err.response?.data?.errors || [];
         return false;
       } finally {

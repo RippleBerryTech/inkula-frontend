@@ -3,7 +3,7 @@
 
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Capital Market Data</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Capital Market Data List</h5>
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
@@ -18,13 +18,18 @@
 
             <div class="datatable">
                 <!-- Loading Spinner -->
-                <Loader v-if="economicStore.loading" size="64" color="#4361ee" />
+                <Loader v-if="capitalMarketDataStore.loading" size="64" color="#4361ee" />
                 <!-- Error -->
-                <div v-else-if="economicStore.error" class="text-red-500 text-center py-4">
-                    {{ economicStore.error }}
+                <div v-else-if="capitalMarketDataStore.error" class="text-red-500 text-center py-4">
+                    {{ capitalMarketDataStore.error }}
+                </div>
+
+                <div v-else-if="capitalMarketDataStore.economicSubmissions?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                    <IconDatabaseOff :size="30" stroke-width="1.5" />
+                    <p class="mt-2">No Capital Market Data Found</p>
                 </div>
                 <!-- DataTable -->
-                <vue3-datatable v-else :rows="economicStore.economicSubmissions" :columns="columns" :totalRows="economicStore.economicSubmissions?.length"
+                <vue3-datatable v-else :rows="capitalMarketDataStore.economicSubmissions" :columns="columns" :totalRows="capitalMarketDataStore.economicSubmissions?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
                     firstArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 17h6l-4 -5l4 -5h-6l-4 5z" /></svg>' 
                     lastArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-6l4 5l-4 5h6l4 -5z" /></svg>' 
@@ -159,17 +164,17 @@
                             </button>
                             <div
                                 class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Capital Market Data
+                                 Select File to Import
                             </div>
                             <div class="p-5" v-if="importEconomicSubmissionModal">
                                 <FileUpload ref="fileUploadRef" :show="importEconomicSubmissionModal"
                                     @file-selected="handleFileSelected" />
 
                                 <!-- Error List -->
-                                <div v-if="economicStore.importErrors.length > 0" class="mt-4">
+                                <div v-if="capitalMarketDataStore.importErrors.length > 0" class="mt-4">
                                     <p class="text-danger font-semibold">Import Errors:</p>
                                     <ul class="list-disc list-inside text-danger">
-                                        <li v-for="error in economicStore.importErrors" :key="error.row">
+                                        <li v-for="error in capitalMarketDataStore.importErrors" :key="error.row">
                                             Row {{ error.row }}: {{ error.errors.join(', ') }}
                                         </li>
                                     </ul>
@@ -179,12 +184,12 @@
                                     <button type="button" @click="closeModal"
                                         class="btn btn-outline-danger">Back</button>
                                     <button type="button" @click="downloadTemplate"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="economicStore.loading">
-                                        {{ economicStore.loading ? 'Downloading...' : 'Download Template' }}
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="capitalMarketDataStore.loading">
+                                        {{ capitalMarketDataStore.loading ? 'Downloading...' : 'Download Template' }}
                                     </button>
                                     <button type="button" @click="importSector"
-                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="economicStore.loading">
-                                        {{ economicStore.loading ? 'Importing...' : 'Import' }}
+                                        class="btn btn-primary ltr:ml-4 rtl:mr-4" :disabled="capitalMarketDataStore.loading">
+                                        {{ capitalMarketDataStore.loading ? 'Importing...' : 'Import' }}
                                     </button>
                                 </div>
                             </div>
@@ -199,7 +204,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconDatabaseOff, IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -231,25 +236,25 @@ const columns =
     ]) || [];
 
 
-const economicStore = useCapitalMarketDataStore();
+const capitalMarketDataStore = useCapitalMarketDataStore();
 
 onMounted(() => {
-    economicStore.fetchCapitalMarketData();
+    capitalMarketDataStore.fetchCapitalMarketData();
 });
 const rows = computed(() =>
-    economicStore.economicSubmissions.map((r, i) => ({ ...r, sn: i + 1 }))
+    capitalMarketDataStore.economicSubmissions.map((r, i) => ({ ...r, sn: i + 1 }))
 );
 const deleteEconomicSubmissionModal = ref(false)
 const selectEconomicSubmissionId = ref(0);
 
 const deleteEconomicSubmission = async () => {
-    var res = await economicStore.deleteCapitalMarketData(selectEconomicSubmissionId.value);
+    var res = await capitalMarketDataStore.deleteCapitalMarketData(selectEconomicSubmissionId.value);
     deleteEconomicSubmissionModal.value = false;
 
     if(res){
         toast.success("Economic Submission deleted successfully");
     }else {
-        toast.error(economicStore.deleteEconomicSubmissionError);
+        toast.error(capitalMarketDataStore.deleteEconomicSubmissionError);
     }
 
 }
@@ -265,7 +270,7 @@ const selectedFile = ref<File | null>(null);
 
 const handleFileSelected = (file: File) => {
     selectedFile.value = file;
-    economicStore.importErrors = []; // Clear errors when a new file is selected
+    capitalMarketDataStore.importErrors = []; // Clear errors when a new file is selected
 };
 
 const importSector = async () => {
@@ -277,16 +282,16 @@ const importSector = async () => {
     const formData = new FormData();
     formData.append('file', selectedFile.value);
 
-    const res = await economicStore.importCapitalMarketData(formData);
+    const res = await capitalMarketDataStore.importCapitalMarketData(formData);
 
     if (res) {
         toast.success('Capital Market Data imported successfully');
         importEconomicSubmissionModal.value = false;
         fileUploadRef.value?.clearPreview();
         selectedFile.value = null;
-        economicStore.importErrors = []; // Clear errors on success
+        capitalMarketDataStore.importErrors = []; // Clear errors on success
     } else {
-        toast.error(economicStore.error || 'Failed to import capital market data');
+        toast.error(capitalMarketDataStore.error || 'Failed to import capital market data');
         // Errors are already stored in sectorStore.importErrors
         fileUploadRef.value?.clickClearBtn();
         selectedFile.value = null;
@@ -294,17 +299,17 @@ const importSector = async () => {
 };
 
 const downloadTemplate = async () => {
-    const res = await economicStore.downloadTemplate();
+    const res = await capitalMarketDataStore.downloadTemplate();
     if (res) {
         toast.success('Template downloaded successfully');
     } else {
-        toast.error(economicStore.error || 'Failed to download template');
+        toast.error(capitalMarketDataStore.error || 'Failed to download template');
     }
 }
 
 const closeModal = () => {
     importEconomicSubmissionModal.value = false;
-    economicStore.importErrors = []; // Clear errors when closing modal
+    capitalMarketDataStore.importErrors = []; // Clear errors when closing modal
     selectedFile.value = null; // Clear selected file
 };
 

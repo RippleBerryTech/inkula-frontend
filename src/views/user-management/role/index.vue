@@ -17,6 +17,10 @@
                 <div v-else-if="roleStore.error" class="text-red-500 text-center py-4">
                     {{ roleStore.error }}
                 </div>
+                <div v-else-if="roleStore.roles?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                    <IconDatabaseOff :size="30" stroke-width="1.5" />
+                    <p class="mt-2">No Roles Found</p>
+                </div>
                 <!-- DataTable -->
                 <vue3-datatable v-else :rows="roleStore.roles" :columns="columns" :totalRows="roleStore.roles?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
@@ -162,7 +166,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconInfoSquareRounded, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconEdit, IconInfoSquareRounded, IconTrash, IconX, IconDatabaseOff } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';

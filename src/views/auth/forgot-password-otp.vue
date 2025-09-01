@@ -21,7 +21,7 @@
                             <div :class="{ 'has-error': $v.form.otp.$error, 'has-success': isSubmitForm && !$v.form.otp.$error }">
                                 <label for="otp" class="dark:text-white">OTP</label>
                                 <div class="relative text-white-dark">
-                                    <input v-model="form.otp" id="otp" type="text" placeholder="Enter OTP" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input v-model="form.otp" id="otp" type="number" placeholder="Enter OTP" class="form-input ps-10 placeholder:text-white-dark" />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
                                        <IconAuth2fa :size="20" stroke-width="1.5" />
                                     </span>

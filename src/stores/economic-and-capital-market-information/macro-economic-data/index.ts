@@ -172,8 +172,6 @@ export const useMacroEconomicDataStore = defineStore('macro-economic-data', {
     },
 
     async importMacroEconomicData(file: FormData) {
-      this.loading = true;
-      this.error = '';
       this.importErrors = []; // Clear previous errors
       try {
         const res = await api.post('/economic-and-capital-market-information/macro-economic-data/import', file, {
@@ -188,12 +186,10 @@ export const useMacroEconomicDataStore = defineStore('macro-economic-data', {
           this.economicSubmissions = res.data.data.macroEconomicData;
           return res.data.success;
         } else {
-          this.error = res.data.message;
           this.importErrors = res.data.errors || []; // Store errors
           return false;
         }
       } catch (err: any) {
-        this.error = err.response?.data?.message || 'Failed to import macro economic data';
         this.importErrors = err.response?.data?.errors || [];
         return false;
       } finally {

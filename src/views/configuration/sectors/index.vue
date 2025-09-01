@@ -18,10 +18,14 @@
                 <div v-else-if="sectorStore.error" class="text-red-500 text-center py-4">
                     {{ sectorStore.error }}
                 </div>
+
+                <div v-else-if="sectorStore.sectors?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                    <IconDatabaseOff :size="30" stroke-width="1.5" />
+                    <p class="mt-2">No Sector Found</p>
+                </div>
                 <!-- DataTable -->
                 <vue3-datatable v-else :rows="sectorStore.sectors" :columns="columns" :totalRows="sectorStore.sectors?.length"
                     :sortable="true" sortColumn="id" :search="search" skin="whitespace-nowrap bh-table-hover"
-                    @row-click="goToSubSectors"
                     firstArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11 17h6l-4 -5l4 -5h-6l-4 5z" /></svg>'
                     lastArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-badge-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-6l4 5l-4 5h6l4 -5z" /></svg>'
                     previousArrow='<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-caret-left"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 6l-6 6l6 6v-12" /></svg>'
@@ -50,6 +54,12 @@
                                 <button v-if="hasPermission('Delete Sector')" type="button" v-tippy="'Delete'">
                                     <IconTrash :size="20" stroke-width="1.5"
                                         @click.stop="deleteSectorModal = true; selectSectorId = data.value.id" />
+                                </button>
+                            </div>
+                            <!-- Sub Sectors (New Plus button) -->
+                            <div>
+                                <button type="button" v-tippy="'Sub Sectors'" @click.stop="goToSubSectors(data.value)">
+                                    <IconPlus :size="20" stroke-width="1.5" />
                                 </button>
                             </div>
                         </div>
@@ -105,7 +115,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconDatabaseOff, IconEdit, IconPlus, IconTrash, IconX } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';

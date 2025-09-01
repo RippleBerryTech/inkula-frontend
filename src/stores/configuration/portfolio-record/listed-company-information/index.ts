@@ -36,9 +36,9 @@ export const useListedCompanyInformationStore = defineStore('listed-company-info
         this.hasFetchedPortfolioRecords = true     
       } catch (err: any) {
         if (err.response?.status === 401) {
-            this.error = 'You are not authorized to view portfolio records.';
+            this.error = 'You are not authorized to view listed company information.';
         } else {
-            this.error = err.response?.data?.message || 'Failed to fetch portfolio records';
+            this.error = err.response?.data?.message || 'Failed to fetch listed company information';
         }
       } finally {
             this.loading = false;
@@ -64,7 +64,7 @@ export const useListedCompanyInformationStore = defineStore('listed-company-info
           return false;
         }
       } catch (err: any) {
-        this.addPortfolioRecordError = err.response?.data?.message || 'Failed to add portfolio record';
+        this.addPortfolioRecordError = err.response?.data?.message || 'Failed to add listed company information';
         if (err.response?.data?.errors) {
           this.addPortfolioRecordFieldErrors = err.response.data.errors;
         }
@@ -87,7 +87,7 @@ export const useListedCompanyInformationStore = defineStore('listed-company-info
           return res.data.success;
         }
       } catch (err: any) {
-        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to edit portfolio record';
+        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to edit listed company information';
         return false;
       } finally {
             this.loading = false;
@@ -117,7 +117,7 @@ export const useListedCompanyInformationStore = defineStore('listed-company-info
           return false;
         }
       } catch (err: any) {
-        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to update portfolio record';
+        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to update listed company information';
         if (err.response?.data?.errors) {
           this.editPortfolioRecordFieldErrors = err.response.data.errors;
         }
@@ -141,7 +141,7 @@ export const useListedCompanyInformationStore = defineStore('listed-company-info
           return res.data.success;
         }
       } catch (err: any) {
-        this.deletePortfolioRecordError = err.response?.data?.message || 'Failed to delete portfolio record';
+        this.deletePortfolioRecordError = err.response?.data?.message || 'Failed to delete listed company information';
         return false;
       } finally {
             this.loading = false;
@@ -149,8 +149,6 @@ export const useListedCompanyInformationStore = defineStore('listed-company-info
     },
 
     async importListedCompanyInformation(file: FormData) {
-      this.loading = true;
-      this.error = '';
       this.importErrors = []; // Clear previous errors
       try {
         const res = await api.post('/configuration/portfolio-record/listed-company-information/import', file, {
@@ -165,12 +163,10 @@ export const useListedCompanyInformationStore = defineStore('listed-company-info
           this.portfolioRecords = res.data.data.listedCompanyInformation;
           return res.data.success;
         } else {
-          this.error = res.data.message;
           this.importErrors = res.data.errors || []; // Store errors
           return false;
         }
       } catch (err: any) {
-        this.error = err.response?.data?.message || 'Failed to import portfolio records';
         this.importErrors = err.response?.data?.errors || [];
         return false;
       } finally {

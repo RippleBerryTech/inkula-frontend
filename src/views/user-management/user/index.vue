@@ -17,6 +17,10 @@
                 <div v-else-if="userStore.error" class="text-red-500 text-center py-4">
                     {{ userStore.error }}
                 </div>
+                <div v-else-if="userStore.users?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                    <IconDatabaseOff :size="30" stroke-width="1.5" />
+                    <p class="mt-2">No Users Found</p>
+                </div>
                 <!-- DataTable -->
                 <vue3-datatable
                     v-else
@@ -117,7 +121,7 @@
     import Vue3Datatable from '@bhplugin/vue3-datatable';
 
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconEdit, IconTrash, IconX, IconDatabaseOff } from '@tabler/icons-vue';
 import { computed, ref } from 'vue';
 import { useMeta } from '../../../composables/use-meta';
 

@@ -417,7 +417,8 @@ const form = reactive({
   inflation: '',
 })
 
-const floatValidator = helpers.regex(/^\d+(\.\d+)?$/)
+const floatValidator = helpers.regex(/^\d+(\.\d{1,2})?$/);
+
 // Validation rules
 const rules = {
   form: {
@@ -476,7 +477,7 @@ const submitForm = async () => {
 
   if (ok) {
     await appRouter.push({
-      name: 'macro-economic-data',
+      name: 'macro-economic-data-show',
     });
     toast.success('Capital market data updated successfully')
   } else {

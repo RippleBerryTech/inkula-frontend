@@ -37,9 +37,9 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
         this.hasFetchedPortfolioRecords = true     
       } catch (err: any) {
         if (err.response?.status === 401) {
-            this.error = 'You are not authorized to view portfolio records.';
+            this.error = 'You are not authorized to view private company informations.';
         } else {
-            this.error = err.response?.data?.message || 'Failed to fetch portfolio records';
+            this.error = err.response?.data?.message || 'Failed to fetch private company informations';
         }
       } finally {
             this.loading = false;
@@ -65,7 +65,7 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
           return false;
         }
       } catch (err: any) {
-        this.addPortfolioRecordError = err.response?.data?.message || 'Failed to add portfolio record';
+        this.addPortfolioRecordError = err.response?.data?.message || 'Failed to add private company information';
         if (err.response?.data?.errors) {
           this.addPortfolioRecordFieldErrors = err.response.data.errors;
         }
@@ -88,7 +88,7 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
           return res.data.success;
         }
       } catch (err: any) {
-        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to edit portfolio record';
+        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to edit private company information';
         return false;
       } finally {
             this.loading = false;
@@ -118,7 +118,7 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
           return false;
         }
       } catch (err: any) {
-        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to update portfolio record';
+        this.editPortfolioRecordError = err.response?.data?.message || 'Failed to update private company information';
         if (err.response?.data?.errors) {
           this.editPortfolioRecordFieldErrors = err.response.data.errors;
         }
@@ -142,7 +142,7 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
           return res.data.success;
         }
       } catch (err: any) {
-        this.deletePortfolioRecordError = err.response?.data?.message || 'Failed to delete portfolio record';
+        this.deletePortfolioRecordError = err.response?.data?.message || 'Failed to delete private company information';
         return false;
       } finally {
             this.loading = false;
@@ -150,8 +150,6 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
     },
 
     async importPrivateCompanyInformation(file: FormData) {
-      this.loading = true;
-      this.error = '';
       this.importErrors = []; // Clear previous errors
       try {
         const res = await api.post('/configuration/portfolio-record/private-company-information/import', file, {
@@ -166,12 +164,10 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
           this.portfolioRecords = res.data.data.privateCompanyInformation;
           return res.data.success;
         } else {
-          this.error = res.data.message;
           this.importErrors = res.data.errors || []; // Store errors
           return false;
         }
       } catch (err: any) {
-        this.error = err.response?.data?.message || 'Failed to import portfolio records';
         this.importErrors = err.response?.data?.errors || [];
         return false;
       } finally {
@@ -191,7 +187,7 @@ export const usePrivateCompanyInformationStore = defineStore('private-company-in
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'portfolio_record_template.xlsx'); // file name
+        link.setAttribute('download', 'private-company-information_template.xlsx'); // file name
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

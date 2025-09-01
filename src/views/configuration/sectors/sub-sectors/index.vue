@@ -18,6 +18,12 @@
                 <div v-else-if="subSectorStore.error" class="text-red-500 text-center py-4">
                     {{ subSectorStore.error }}
                 </div>
+
+                <div v-else-if="subSectorStore.sectors?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                    <IconDatabaseOff :size="30" stroke-width="1.5" />
+                    <p class="mt-2">No Sub Sectors Found</p>
+                </div>
+
                 <!-- DataTable -->
                 <vue3-datatable v-else :rows="subSectorStore.sectors" :columns="columns"
                     :totalRows="subSectorStore.sectors?.length" :sortable="true" sortColumn="id" :search="search"
@@ -107,7 +113,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconDatabaseOff, IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';

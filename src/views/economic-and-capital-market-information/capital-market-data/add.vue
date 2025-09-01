@@ -411,7 +411,7 @@ const form = reactive({
   inflation: '',
 })
 
-const floatValidator = helpers.regex(/^\d+(\.\d+)?$/)
+const floatValidator = helpers.regex(/^\d+(\.\d{1,2})?$/);
 // Validation rules
 const rules = {
   form: {

@@ -3,7 +3,7 @@
 
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Macro Economic Data</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Macro Economic Data List</h5>
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
@@ -22,6 +22,11 @@
                 <!-- Error -->
                 <div v-else-if="macroEconomicDataStore.error" class="text-red-500 text-center py-4">
                     {{ macroEconomicDataStore.error }}
+                </div>
+
+                <div v-else-if="macroEconomicDataStore.economicSubmissions?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                    <IconDatabaseOff :size="30" stroke-width="1.5" />
+                    <p class="mt-2">No Macro Economic Data Found</p>
                 </div>
                 <!-- DataTable -->
                 <vue3-datatable v-else :rows="macroEconomicDataStore.economicSubmissions" :columns="columns" :totalRows="macroEconomicDataStore.economicSubmissions?.length"
@@ -159,7 +164,7 @@
                             </button>
                             <div
                                 class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Macro Economic Data
+                                 Select File to Import
                             </div>
                             <div class="p-5" v-if="importEconomicSubmissionModal">
                                 <FileUpload ref="fileUploadRef" :show="importEconomicSubmissionModal"
@@ -199,7 +204,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconEye, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconEdit, IconEye, IconTrash, IconX, IconDatabaseOff } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -211,8 +216,8 @@ import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import FileUpload from '../../components/file-upload.vue';
 
+import { useMacroEconomicDataStore } from '@/stores/economic-and-capital-market-information/macro-economic-data';
 import Loader from '../../components/loader.vue';
-import { useCapitalMarketDataStore } from '@/stores/economic-and-capital-market-information/capital-market-data';
 const { hasRole, hasPermission } = usePermissions()
 
 useMeta({ title: 'Macro Economic Data' });
@@ -231,10 +236,10 @@ const columns =
     ]) || [];
 
 
-const macroEconomicDataStore = useCapitalMarketDataStore();
+const macroEconomicDataStore = useMacroEconomicDataStore();
 
 onMounted(() => {
-    macroEconomicDataStore.fetchCapitalMarketData();
+    macroEconomicDataStore.fetchMacroEconomicData();
 });
 const rows = computed(() =>
     macroEconomicDataStore.economicSubmissions.map((r, i) => ({ ...r, sn: i + 1 }))
@@ -243,7 +248,7 @@ const deleteEconomicSubmissionModal = ref(false)
 const selectEconomicSubmissionId = ref(0);
 
 const deleteEconomicSubmission = async () => {
-    var res = await macroEconomicDataStore.deleteCapitalMarketData(selectEconomicSubmissionId.value);
+    var res = await macroEconomicDataStore.deleteMacroEconomicData(selectEconomicSubmissionId.value);
     deleteEconomicSubmissionModal.value = false;
 
     if(res){
@@ -277,7 +282,7 @@ const importSector = async () => {
     const formData = new FormData();
     formData.append('file', selectedFile.value);
 
-    const res = await macroEconomicDataStore.importCapitalMarketData(formData);
+    const res = await macroEconomicDataStore.importMacroEconomicData(formData);
 
     if (res) {
         toast.success('Capital Market Data imported successfully');

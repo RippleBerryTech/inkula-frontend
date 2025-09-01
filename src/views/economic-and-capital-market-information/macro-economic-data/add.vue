@@ -377,13 +377,13 @@
 </template>
 <script lang="ts" setup>
 import { appRouter } from '@/router';
+import { useMacroEconomicDataStore } from '@/stores/economic-and-capital-market-information/macro-economic-data';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import useVuelidate from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
 import { useMeta } from '../../../composables/use-meta';
-import { useMacroEconomicDataStore } from '@/stores/economic-and-capital-market-information/macro-economic-data';
 useMeta({ title: 'Add Macro Economic Data' });
 // Reactive form data
 const form = reactive({
@@ -411,7 +411,7 @@ const form = reactive({
   inflation: '',
 })
 
-const floatValidator = helpers.regex(/^\d+(\.\d+)?$/)
+const floatValidator = helpers.regex(/^\d+(\.\d{1,2})?$/);
 // Validation rules
 const rules = {
   form: {

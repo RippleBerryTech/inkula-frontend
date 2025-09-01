@@ -3,7 +3,7 @@
 
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                <h5 class="font-semibold text-lg dark:text-white-light">Listed Company Information</h5>
+                <h5 class="font-semibold text-lg dark:text-white-light">Listed Company Information List</h5>
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
@@ -22,6 +22,11 @@
                 <!-- Error -->
                 <div v-else-if="listedCompanyInformationStore.error" class="text-red-500 text-center py-4">
                     {{ listedCompanyInformationStore.error }}
+                </div>
+
+                <div v-else-if="listedCompanyInformationStore.portfolioRecords?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                    <IconDatabaseOff :size="30" stroke-width="1.5" />
+                    <p class="mt-2">No Listed Company Information Found</p>
                 </div>
                 <!-- DataTable -->
                 <vue3-datatable v-else :rows="listedCompanyInformationStore.portfolioRecords" :columns="columns" :totalRows="listedCompanyInformationStore.portfolioRecords?.length"
@@ -128,7 +133,7 @@
                             </button>
                             <div
                                 class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
-                                Select File to Listed Company Information
+                                Select File to Import
                             </div>
                             <div class="p-5" v-if="importPortfolioRecordModal">
                                 <FileUpload ref="fileUploadRef" :show="importPortfolioRecordModal"
@@ -168,7 +173,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconDatabaseOff, IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
