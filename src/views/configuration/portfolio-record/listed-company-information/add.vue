@@ -94,7 +94,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { onMounted, reactive, ref } from 'vue';
 import { toast } from 'vue3-toastify';
-import { useMeta } from '../../../composables/use-meta';
+import { useMeta } from '../../../../composables/use-meta';
 useMeta({ title: 'Add Portfolio Record' });
 // Reactive form data
 const form = reactive({
