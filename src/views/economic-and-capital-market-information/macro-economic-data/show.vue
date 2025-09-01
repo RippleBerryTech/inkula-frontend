@@ -5,7 +5,7 @@
                 <!-- Basic -->
                 <div class="panel">
                     <div class="flex items-center justify-between mb-5">
-                        <h5 class="font-semibold text-lg dark:text-white-light">Economic Submission Details</h5>
+                        <h5 class="font-semibold text-lg dark:text-white-light">Macro Economic Data Details</h5>
                     </div>
                     <div class="space-y-8">
                         <!-- Investment Funds -->
