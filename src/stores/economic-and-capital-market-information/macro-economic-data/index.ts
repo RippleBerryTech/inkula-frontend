@@ -71,7 +71,7 @@ export const useMacroEconomicDataStore = defineStore('macro-economic-data', {
       try {
         const res = await api.post('/economic-and-capital-market-information/macro-economic-data/store', data);
         if (res.data.success) {
-          this.economicSubmissions.push(res.data.data.economicSubmissions);
+          this.economicSubmissions.push(res.data.data.macroEconomicData);
           return res.data.success;
         } else {
           this.addEconomicSubmissionError = res.data.message;
@@ -133,7 +133,7 @@ export const useMacroEconomicDataStore = defineStore('macro-economic-data', {
         if (res.data.success) {
           this.economicSubmissions = this.economicSubmissions.map((role) => {
             if (role.id === data.id) {
-              return res.data.data.economicSubmission;
+              return res.data.data.macroEconomicData;
             }
             return role;
           });
@@ -157,7 +157,7 @@ export const useMacroEconomicDataStore = defineStore('macro-economic-data', {
       try {
         const res = await api.delete(`/economic-and-capital-market-information/macro-economic-data/delete/${id}`);
         if (res.data.success) {
-          this.economicSubmissions = this.economicSubmissions.filter((role) => role.id !== id);
+          this.economicSubmissions = this.economicSubmissions.filter((data) => data.id !== id);
           return res.data.success;
         } else {
           this.deleteEconomicSubmissionError = res.data.message;
@@ -185,7 +185,7 @@ export const useMacroEconomicDataStore = defineStore('macro-economic-data', {
         if (res.data.success) {
           // clear previous records and set new ones
           this.economicSubmissions = [];
-          this.economicSubmissions = res.data.data.economicSubmissions;
+          this.economicSubmissions = res.data.data.macroEconomicData;
           return res.data.success;
         } else {
           this.error = res.data.message;

@@ -71,7 +71,7 @@ export const useCapitalMarketDataStore = defineStore('capital-market-data', {
       try {
         const res = await api.post('/economic-and-capital-market-information/capital-market-data/store', data);
         if (res.data.success) {
-          this.economicSubmissions.push(res.data.data.economicSubmissions);
+          this.economicSubmissions.push(res.data.data.macroEconomicData);
           return res.data.success;
         } else {
           this.addEconomicSubmissionError = res.data.message;
@@ -133,7 +133,7 @@ export const useCapitalMarketDataStore = defineStore('capital-market-data', {
         if (res.data.success) {
           this.economicSubmissions = this.economicSubmissions.map((role) => {
             if (role.id === data.id) {
-              return res.data.data.economicSubmission;
+              return res.data.data.capitalMarketData;
             }
             return role;
           });
@@ -185,7 +185,7 @@ export const useCapitalMarketDataStore = defineStore('capital-market-data', {
         if (res.data.success) {
           // clear previous records and set new ones
           this.economicSubmissions = [];
-          this.economicSubmissions = res.data.data.economicSubmissions;
+          this.economicSubmissions = res.data.data.capitalMarketData;
           return res.data.success;
         } else {
           this.error = res.data.message;

@@ -7,7 +7,7 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link to="/economic-and-capital-market-information/sectors/add" v-if="hasPermission('Add Sector')"
+                <router-link :to="{name: 'sector-add'}" v-if="hasPermission('Add Sector')"
                     class="btn btn-primary" v-tippy="'Add Sector'">Add</router-link>
             </div>
 
