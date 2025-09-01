@@ -285,13 +285,13 @@ const importSector = async () => {
     const res = await macroEconomicDataStore.importMacroEconomicData(formData);
 
     if (res) {
-        toast.success('Capital Market Data imported successfully');
+        toast.success('Macro Economic Data imported successfully');
         importEconomicSubmissionModal.value = false;
         fileUploadRef.value?.clearPreview();
         selectedFile.value = null;
         macroEconomicDataStore.importErrors = []; // Clear errors on success
     } else {
-        toast.error(macroEconomicDataStore.error || 'Failed to import Capital Market Data');
+        toast.error(macroEconomicDataStore.error || 'Failed to import macro economic data');
         // Errors are already stored in sectorStore.importErrors
         fileUploadRef.value?.clickClearBtn();
         selectedFile.value = null;
