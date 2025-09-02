@@ -30,7 +30,7 @@
 
               <div class="flex justify-end items-center mt-8 space-x-4">
                 <router-link :to="{ name: 'sub-sectors-list', params: { id: route.params.id } }" class="group">
-                  <button type="button" class="btn btn-outline-danger">Cancel</button>
+                  <button type="button" class="btn btn-outline-danger" @click="cancelForm">Cancel</button>
                 </router-link>
 
 
@@ -114,6 +114,21 @@ const submitForm = async () => {
   } else {
     toast.error('Validation Failed')
   }
+}
+
+const cancelForm = () => {
+  // Reset form
+  form.name = ''
+
+  // Reset validation
+  $v.value.$reset()
+  isSubmitForm.value = false
+
+  // Reset store error safely
+  subSectorStore.addSubSectorError = ''
+
+  // Navigate to sub-sectors list
+  appRouter.push({ name: 'sub-sectors-list', params: { id: route.params.id } })
 }
 
 const subSectorStore = useSubSectorStore();

@@ -61,7 +61,7 @@
 
               <div class="flex justify-end items-center mt-8 space-x-4">
                 <router-link :to="{name: 'private-company-information-list'}" class="group">
-                  <button type="button" class="btn btn-outline-danger">Cancel</button>
+                  <button type="button" class="btn btn-outline-danger" @click="cancelForm">Cancel</button>
                 </router-link>
 
                 <div>
@@ -155,6 +155,25 @@ const submitForm = async () => {
       }
     }
   }
+};
+
+const cancelForm = () => {
+  // Reset form fields
+  form.name = '';
+  form.website = '';
+
+  // Reset validation
+  $v.value.$reset();
+  isSubmitForm.value = false;
+
+  // Reset backend errors
+  Object.keys(backendErrors).forEach(k => backendErrors[k] = '');
+
+  // Reset store error safely (use empty string instead of null)
+  privateCompanyInformationStore.addPortfolioRecordError = '';
+
+  // Navigate back to list
+  appRouter.push({ name: 'private-company-information-list' });
 };
 
 const privateCompanyInformationStore = usePrivateCompanyInformationStore();

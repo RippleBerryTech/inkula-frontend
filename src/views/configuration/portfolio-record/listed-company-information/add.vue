@@ -61,7 +61,8 @@
 
               <div class="flex justify-end items-center mt-8 space-x-4">
                 <router-link :to="{name: 'listed-company-information-list'}" class="group">
-                  <button type="button" class="btn btn-outline-danger">Cancel</button>
+                  <button type="button" class="btn btn-outline-danger" @click="cancelForm">Cancel</button>
+
                 </router-link>
 
                 <div>
@@ -156,6 +157,25 @@ const submitForm = async () => {
     }
   }
 };
+
+const cancelForm = () => {
+  // Reset form fields
+  form.name = '';
+  form.website = '';
+
+  // Reset frontend validation
+  $v.value.$reset();
+  isSubmitForm.value = false;
+
+  // Reset backend errors
+  Object.keys(backendErrors).forEach(key => backendErrors[key] = '');
+
+  // Reset store error safely
+  listedCompanyInformationStore.addPortfolioRecordError = '';
+
+  // Navigate to list page
+  appRouter.push({ name: 'listed-company-information-list' });
+}
 
 const listedCompanyInformationStore = useListedCompanyInformationStore();
 
