@@ -5,27 +5,15 @@
     <form class="space-y-5" @submit.prevent="submitForm">
       <div class="flex flex-col md:flex-row gap-4">
         <!-- Sector Name -->
-        <div
-          class="flex-1"
-          :class="{ 'has-error': $v.form.name.$error, 'has-success': isSubmitForm && !$v.form.name.$error }"
-        >
+        <div class="flex-1"
+          :class="{ 'has-error': $v.form.name.$error, 'has-success': isSubmitForm && !$v.form.name.$error }">
           <label for="name">Sector Name</label>
-          <input
-            id="name"
-            type="text"
-            placeholder="Enter Sector Name"
-            class="form-input"
-            v-model="form.name"
-          />
+          <input id="name" type="text" placeholder="Enter Sector Name" class="form-input" v-model="form.name" />
           <template v-if="isSubmitForm && !$v.form.name.$error">
             <p class="text-[#1abc9c] mt-1">Looks Good!</p>
           </template>
           <template v-if="isSubmitForm && $v.form.name.$error">
-            <p
-              v-for="error in $v.form.name.$errors"
-              :key="error.$uid"
-              class="text-danger mt-1"
-            >
+            <p v-for="error in $v.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
               <span v-if="error.$validator === 'required'">Sector Name is required</span>
             </p>
           </template>

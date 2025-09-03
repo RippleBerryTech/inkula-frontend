@@ -276,7 +276,7 @@
         </div>
     </Dialog>
     </TransitionRoot>
-
+    <!-- Edit Listed Company Information Modal -->
     <TransitionRoot appear :show="editModal" as="template">
     <Dialog as="div" @close="closeEditModal" class="relative z-[51]">
         <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
@@ -498,12 +498,14 @@ const addForm = reactive({
 });
 
 const addRules = {
-  name: { required },
-  website: {},
+  form:{
+    name: { required },
+    website: {},
+  }
 };
 
 const isSubmitAddForm = ref(false);
-const $vAdd = useVuelidate(addRules, addForm);
+const $vAdd = useVuelidate(addRules, {form: addForm});
 
 // Edit Form
 const editForm = reactive({
@@ -513,12 +515,14 @@ const editForm = reactive({
 });
 
 const editRules = {
-  name: { required },
-  website: {},
+    form:{
+        name: { required },
+        website: {},
+    }
 };
 
 const isSubmitEditForm = ref(false);
-const $vEdit = useVuelidate(editRules, editForm);
+const $vEdit = useVuelidate(editRules, {form: editForm});
 
 // Backend errors
 const backendErrors = reactive({
