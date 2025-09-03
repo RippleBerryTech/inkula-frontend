@@ -13,7 +13,9 @@
                         Import
                     </button>
                 </div>
-                <router-link :to="{name: 'listed-company-information-add'}" v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary">Add</router-link>
+                <!-- <router-link :to="{name: 'listed-company-information-add'}" v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary">Add</router-link> -->
+
+                <button v-if="hasPermission('Add Portfolio Record')" class="btn btn-primary" @click="openAddModal">Add</button>
             </div>
 
             <div class="datatable">
@@ -53,10 +55,15 @@
                     <template #action="data">
                         <div class="flex items-center">
                             <div>
-                                <router-link v-if="hasPermission('Edit Portfolio Record')" :to="{ name: 'listed-company-information-edit', params: { id: data.value.id } }"
+                                <!-- <router-link v-if="hasPermission('Edit Portfolio Record')" :to="{ name: 'listed-company-information-edit', params: { id: data.value.id } }"
                                     class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
                                     <IconEdit :size="20" stroke-width="1.5" />
-                                </router-link>
+                                </router-link> -->
+                                <button v-if="hasPermission('Edit Portfolio Record')" 
+                                    @click="openEditModal(data.value.id)"
+                                    class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
+                                    <IconEdit :size="20" stroke-width="1.5" />
+                                </button>
                             </div>
                             <div>
                                 <button v-if="hasPermission('Delete Portfolio Record')" type="button" v-tippy="'Delete'">
@@ -169,6 +176,207 @@
         </Dialog>
     </TransitionRoot>
 
+    <!-- Add Listed Company Information Modal -->
+    <TransitionRoot appear :show="addModal" as="template">
+    <Dialog as="div" @close="closeAddModal" class="relative z-[51]">
+        <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+            leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+            <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-start justify-center px-4 py-8">
+                <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+                    enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+                    leave-to="opacity-0 scale-95">
+                    <DialogPanel
+                        class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
+                        <button type="button"
+                            class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                            @click="closeAddModal">
+                            <IconX :size="20" stroke-width="1.5" />
+                        </button>
+                        <div
+                            class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                            Add Listed Company Information
+                        </div>
+                        <div class="p-5">
+                            <!-- Copy the form from your add.vue component here -->
+                            <form class="space-y-5" @submit.prevent="submitAddForm">
+                                <div class="flex flex-col md:flex-row gap-4">
+                                    <!-- Name -->
+                                    <div class="flex-1" :class="{
+                                      'has-error': $vAdd.form.name.$error || backendErrors.name,
+                                      'has-success': isSubmitAddForm && !$vAdd.form.name.$error && !backendErrors.name
+                                    }">
+                                        <label for="name">Name</label>
+                                        <input id="name" type="text" placeholder="Enter Name" class="form-input" v-model="addForm.name" />
+
+                                        <!-- Looks Good -->
+                                        <template v-if="isSubmitAddForm && !$vAdd.form.name.$error && !backendErrors.name">
+                                            <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                                        </template>
+
+                                        <!-- Frontend errors -->
+                                        <template v-if="isSubmitAddForm && $vAdd.form.name.$error">
+                                            <p v-for="error in $vAdd.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
+                                                <span v-if="error.$validator === 'required'">Name is required</span>
+                                            </p>
+                                        </template>
+
+                                        <!-- Backend error -->
+                                        <template v-if="backendErrors.name">
+                                            <p class="text-danger mt-1">{{ backendErrors.name }}</p>
+                                        </template>
+                                    </div>
+
+                                    <!-- Website -->
+                                    <div class="flex-1" :class="{
+                                      'has-error': $vAdd.form.website.$error || backendErrors.website,
+                                      'has-success': isSubmitAddForm && !$vAdd.form.website.$error && !backendErrors.website
+                                    }">
+                                        <label for="website">Website</label>
+                                        <input id="website" type="text" placeholder="Enter website" class="form-input"
+                                            v-model="addForm.website" />
+
+                                        <!-- Looks Good -->
+                                        <template v-if="isSubmitAddForm && !$vAdd.form.website.$error && !backendErrors.website">
+                                            <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                                        </template>
+
+                                        <!-- Backend error -->
+                                        <template v-if="backendErrors.website">
+                                            <p class="text-danger mt-1">{{ backendErrors.website }}</p>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end items-center mt-8 space-x-4">
+                                    <button type="button" class="btn btn-outline-danger" @click="closeAddModal">Cancel</button>
+
+                                    <div>
+                                        <span v-if="!listedCompanyInformationStore.loading">
+                                            <button type="submit" class="btn btn-primary mt-0">Add</button>
+                                        </span>
+                                        <span v-else>
+                                            <button type="button" class="btn btn-primary mt-0" disabled>
+                                                Loading...
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="text-danger mt-1" v-if="listedCompanyInformationStore.addPortfolioRecordError">{{
+                                    listedCompanyInformationStore.addPortfolioRecordError }}</div>
+                            </form>
+                        </div>
+                    </DialogPanel>
+                </TransitionChild>
+            </div>
+        </div>
+    </Dialog>
+    </TransitionRoot>
+
+    <TransitionRoot appear :show="editModal" as="template">
+    <Dialog as="div" @close="closeEditModal" class="relative z-[51]">
+        <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+            leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+            <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-start justify-center px-4 py-8">
+                <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+                    enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+                    leave-to="opacity-0 scale-95">
+                    <DialogPanel
+                        class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-2xl text-black dark:text-white-dark">
+                        <button type="button"
+                            class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                            @click="closeEditModal">
+                            <IconX :size="20" stroke-width="1.5" />
+                        </button>
+                        <div
+                            class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">
+                            Edit Listed Company Information
+                        </div>
+                        <div class="p-5">
+                            <!-- Copy the form from your edit.vue component here -->
+                            <form class="space-y-5" @submit.prevent="submitEditForm">
+                                <div class="flex flex-col md:flex-row gap-4">
+                                    <!-- Name -->
+                                    <div class="flex-1" :class="{
+                                      'has-error': $vEdit.form.name.$error || backendErrors.name,
+                                      'has-success': isSubmitEditForm && !$vEdit.form.name.$error && !backendErrors.name
+                                    }">
+                                        <label for="name">Name</label>
+                                        <input id="name" type="text" placeholder="Enter Name" class="form-input" v-model="editForm.name" />
+
+                                        <!-- Looks Good -->
+                                        <template v-if="isSubmitEditForm && !$vEdit.form.name.$error && !backendErrors.name">
+                                            <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                                        </template>
+
+                                        <!-- Frontend errors -->
+                                        <template v-if="isSubmitEditForm && $vEdit.form.name.$error">
+                                            <p v-for="error in $vEdit.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
+                                                <span v-if="error.$validator === 'required'">Name is required</span>
+                                            </p>
+                                        </template>
+
+                                        <!-- Backend error -->
+                                        <template v-if="backendErrors.name">
+                                            <p class="text-danger mt-1">{{ backendErrors.name }}</p>
+                                        </template>
+                                    </div>
+
+                                    <!-- Website -->
+                                    <div class="flex-1" :class="{
+                                      'has-error': $vEdit.form.website.$error || backendErrors.website,
+                                      'has-success': isSubmitEditForm && !$vEdit.form.website.$error && !backendErrors.website
+                                    }">
+                                        <label for="website">Website</label>
+                                        <input id="website" type="text" placeholder="Enter website" class="form-input"
+                                            v-model="editForm.website" />
+
+                                        <!-- Looks Good -->
+                                        <template v-if="isSubmitEditForm && !$vEdit.form.website.$error && !backendErrors.website">
+                                            <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                                        </template>
+
+                                        <!-- Backend error -->
+                                        <template v-if="backendErrors.website">
+                                            <p class="text-danger mt-1">{{ backendErrors.website }}</p>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end items-center mt-8 space-x-4">
+                                    <button type="button" class="btn btn-outline-danger" @click="closeEditModal">Cancel</button>
+
+                                    <div>
+                                        <span v-if="!listedCompanyInformationStore.loading">
+                                            <button type="submit" class="btn btn-primary mt-0">Update</button>
+                                        </span>
+                                        <span v-else>
+                                            <button type="button" class="btn btn-primary mt-0" disabled>
+                                                Loading...
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="text-danger mt-1" v-if="listedCompanyInformationStore.editPortfolioRecordError">{{
+                                    listedCompanyInformationStore.editPortfolioRecordError }}</div>
+                            </form>
+                        </div>
+                    </DialogPanel>
+                </TransitionChild>
+            </div>
+        </div>
+    </Dialog>
+    </TransitionRoot>
+
 </template>
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
@@ -177,7 +385,7 @@ import { IconDatabaseOff, IconEdit, IconTrash, IconX } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { computed, ref } from 'vue';
+import { computed, ref, reactive } from 'vue';
 import { useMeta } from '../../../../composables/use-meta';
 
 import { usePermissions } from '@/composables/usePermissions';
@@ -185,30 +393,34 @@ import { onMounted } from 'vue';
 import { toast } from 'vue3-toastify';
 import FileUpload from '../../../components/file-upload.vue';
 
-
 import { useListedCompanyInformationStore } from '@/stores/configuration/portfolio-record/listed-company-information';
 import Loader from '../../../components/loader.vue';
+
+// Add these imports for Vuelidate
+import useVuelidate from '@vuelidate/core';
+import { helpers, required } from '@vuelidate/validators';
+
 const { hasRole, hasPermission } = usePermissions()
 
 useMeta({ title: 'Listed Company Information' });
 const search = ref('');
-const columns =
-    ref([
-        { field: 'id', title: '#' },
-        { field: 'name', title: 'Name' },
-        { field: 'website', title: 'Website' },
-        { field: 'action', title: 'Action', sort: false },
-    ]) || [];
-
+const columns = ref([
+    { field: 'id', title: '#' },
+    { field: 'name', title: 'Name' },
+    { field: 'website', title: 'Website' },
+    { field: 'action', title: 'Action', sort: false },
+]) || [];
 
 const listedCompanyInformationStore = useListedCompanyInformationStore();
 
 onMounted(() => {
     listedCompanyInformationStore.fetchListedCompanyInformation();
 });
+
 const rows = computed(() =>
     listedCompanyInformationStore.portfolioRecords.map((r, i) => ({ ...r, sn: i + 1 }))
 );
+
 const deletePortfolioRecordModal = ref(false)
 const selectPortfolioRecordId = ref(0);
 
@@ -221,16 +433,13 @@ const deletePortfolioRecord = async () => {
     }else {
         toast.error(listedCompanyInformationStore.deletePortfolioRecordError);
     }
-
 }
-
 
 const importPortfolioRecordModal = ref(false);
 
 // Import function
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
 const selectedFile = ref<File | null>(null);
-
 
 const handleFileSelected = (file: File) => {
     selectedFile.value = file;
@@ -275,8 +484,156 @@ const downloadTemplate = async () => {
     } else {
         toast.error(listedCompanyInformationStore.error || 'Failed to download template');
     }
-}
+};
 
+// Add and Edit Modal Variables
+const addModal = ref(false);
+const editModal = ref(false);
+const selectedRecordId = ref(0);
+
+// Add Form
+const addForm = reactive({
+  name: '',
+  website: '',
+});
+
+const addRules = {
+  name: { required },
+  website: {},
+};
+
+const isSubmitAddForm = ref(false);
+const $vAdd = useVuelidate(addRules, addForm);
+
+// Edit Form
+const editForm = reactive({
+  id: '',
+  name: '',
+  website: '',
+});
+
+const editRules = {
+  name: { required },
+  website: {},
+};
+
+const isSubmitEditForm = ref(false);
+const $vEdit = useVuelidate(editRules, editForm);
+
+// Backend errors
+const backendErrors = reactive({
+  name: '',
+  website: ''
+});
+
+// Modal functions
+const openAddModal = () => {
+  addModal.value = true;
+  resetAddForm();
+};
+
+const closeAddModal = () => {
+  addModal.value = false;
+  resetAddForm();
+};
+
+const openEditModal = (id: number) => {
+  selectedRecordId.value = id;
+  loadRecordForEdit(id);
+  editModal.value = true;
+};
+
+const closeEditModal = () => {
+  editModal.value = false;
+  resetEditForm();
+};
+
+const resetAddForm = () => {
+  addForm.name = '';
+  addForm.website = '';
+  isSubmitAddForm.value = false;
+  $vAdd.value.$reset();
+  Object.keys(backendErrors).forEach(key => backendErrors[key] = '');
+  listedCompanyInformationStore.addPortfolioRecordError = '';
+};
+
+const resetEditForm = () => {
+  editForm.id = '';
+  editForm.name = '';
+  editForm.website = '';
+  isSubmitEditForm.value = false;
+  $vEdit.value.$reset();
+  Object.keys(backendErrors).forEach(key => backendErrors[key] = '');
+  listedCompanyInformationStore.editPortfolioRecordError = '';
+};
+
+// Load record for editing
+const loadRecordForEdit = async (id: number) => {
+  const record = await listedCompanyInformationStore.editListedCompanyInformation(id);
+  if (record) {
+    editForm.id = record.id.toString();
+    editForm.name = record.name;
+    editForm.website = record.website;
+  } else {
+    toast.error(listedCompanyInformationStore.editPortfolioRecordError || 'Record not found');
+    closeEditModal();
+  }
+};
+
+// Form submission functions
+const submitAddForm = async () => {
+  isSubmitAddForm.value = true;
+  Object.keys(backendErrors).forEach(k => backendErrors[k] = '');
+  
+  await $vAdd.value.$validate();
+  
+  if (!$vAdd.value.$invalid) {
+    if (addForm.website && !addForm.website.startsWith("http://") && !addForm.website.startsWith("https://")) {
+      addForm.website = "https://" + addForm.website;
+    }
+    
+    const res = await listedCompanyInformationStore.addListedCompanyInformation(addForm);
+    
+    if (res === true) {
+      toast.success("Listed Company Information added successfully");
+      closeAddModal();
+      listedCompanyInformationStore.fetchListedCompanyInformation(); // Refresh the list
+    } else {
+      for (const field in listedCompanyInformationStore.addPortfolioRecordFieldErrors) {
+        backendErrors[field] = listedCompanyInformationStore.addPortfolioRecordFieldErrors[field][0];
+      }
+    }
+  }
+};
+
+const submitEditForm = async () => {
+  isSubmitEditForm.value = true;
+  Object.keys(backendErrors).forEach(k => backendErrors[k] = '');
+  
+  await $vEdit.value.$validate();
+  
+  if (!$vEdit.value.$invalid) {
+    if (editForm.website && !editForm.website.startsWith("http://") && !editForm.website.startsWith("https://")) {
+      editForm.website = "https://" + editForm.website;
+    }
+    
+    const ok = await listedCompanyInformationStore.updateListedCompanyInformation({
+      id: Number(editForm.id),
+      name: editForm.name,
+      website: editForm.website
+    });
+    
+    if (ok === true) {
+      toast.success('Listed Company Information updated successfully');
+      closeEditModal();
+      listedCompanyInformationStore.fetchListedCompanyInformation(); // Refresh the list
+    } else {
+      for (const field in listedCompanyInformationStore.editPortfolioRecordFieldErrors) {
+        backendErrors[field] = listedCompanyInformationStore.editPortfolioRecordFieldErrors[field][0];
+      }
+    }
+  }
+};
 </script>
 
 <style></style>
