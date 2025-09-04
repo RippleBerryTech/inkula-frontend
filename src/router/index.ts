@@ -186,6 +186,12 @@ const routes: RouteRecordRaw[] = [
                         component: () => import('../../src/views/configuration/sectors/sub-sectors/index.vue'),
                     },
                     {
+                        path: 'view',
+                        name: 'sub-sectors-view',
+                        props: true,
+                        component: () => import('../../src/views/configuration/sectors/sub-sectors/view.vue'),
+                    },
+                    {
                         path: 'add',
                         name: 'sub-sector-add',
                         props: true,
