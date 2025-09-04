@@ -1,5 +1,15 @@
 <template>
     <div>
+        <div class="flex items-center mb-4">
+            <router-link :to="{ name: 'sectors-list' }"
+                class="inline-flex items-center justify-center w-10 h-10 rounded-[5px] border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </router-link>
+
+        </div>
 
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
@@ -7,8 +17,9 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link :to="{ name: 'sub-sector-add', params: { id: props.id } }"
-                    v-if="hasPermission('Add Sector')" class="btn btn-primary" v-tippy="'Add Sector'">Add</router-link>
+                <button v-if="hasPermission('Add Sector')" class="btn btn-primary" @click="addSubSectorModal = true">
+                    Add
+                </button>
             </div>
 
             <div class="datatable">
@@ -19,7 +30,8 @@
                     {{ subSectorStore.error }}
                 </div>
 
-                <div v-else-if="subSectorStore.sectors?.length === 0" class="flex flex-col items-center justify-center text-red-500 py-4">
+                <div v-else-if="subSectorStore.sectors?.length === 0"
+                    class="flex flex-col items-center justify-center text-red-500 py-4">
                     <IconDatabaseOff :size="30" stroke-width="1.5" />
                     <p class="mt-2">No Sub Sectors Found</p>
                 </div>
@@ -45,12 +57,10 @@
                     <template #action="data">
                         <div class="flex items-center">
                             <div>
-                                <router-link v-if="hasPermission('Edit Sector')" :to="{
-                                    name: 'sub-sector-edit',
-                                    params: { id: data.value.sector_id, sub_sector: data.value.id }
-                                }" class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit Sub-Sector'">
+                                <button v-if="hasPermission('Edit Sector')" @click="openEditModal(data.value)"
+                                    class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit Sub-Sector'">
                                     <IconEdit :size="20" stroke-width="1.5" />
-                                </router-link>
+                                </button>
 
                             </div>
                             <div>
@@ -107,7 +117,66 @@
         </Dialog>
     </TransitionRoot>
 
+    <!-- Add Sub Sector Modal -->
+    <TransitionRoot appear :show="addSubSectorModal" as="template">
+        <Dialog as="div" @close="addSubSectorModal = false" class="relative z-[51]">
+            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+                leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+                <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+            </TransitionChild>
 
+            <div class="fixed inset-0 overflow-y-auto">
+                <div class="flex min-h-full items-start justify-center px-4 py-8">
+                    <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95">
+                        <DialogPanel
+                            class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+                            <button type="button"
+                                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                                @click="addSubSectorModal = false">
+                                <IconX :size="20" stroke-width="1.5" />
+                            </button>
+
+                            <AddSubSectorForm :sector-id="props.id" @saved="handleSubSectorAdded"
+                                @cancel="addSubSectorModal = false" />
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
+
+    <!-- Edit Sub Sector Modal -->
+    <TransitionRoot appear :show="editSubSectorModal" as="template">
+        <Dialog as="div" @close="editSubSectorModal = false" class="relative z-[51]">
+            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+                leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+                <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 overflow-y-auto">
+                <div class="flex min-h-full items-start justify-center px-4 py-8">
+                    <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95">
+                        <DialogPanel
+                            class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+                            <button type="button"
+                                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                                @click="editSubSectorModal = false">
+                                <IconX :size="20" stroke-width="1.5" />
+                            </button>
+
+                            <EditSubSectorForm v-if="selectedSubSector" :sector-id="props.id"
+                                :sub-sector="selectedSubSector" @saved="handleSubSectorUpdated"
+                                @cancel="editSubSectorModal = false" />
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
 
 </template>
 <script setup lang="ts">
@@ -126,35 +195,39 @@ import { toast } from 'vue3-toastify';
 
 import { useSubSectorStore } from '@/stores/configuration/sectors/sub-sectors';
 import Loader from '../../../components/loader.vue';
+import AddSubSectorForm from '../../../components/sectors/AddSubSectorForm.vue';
+import EditSubSectorForm from '../../../components/sectors/EditSubSectorForm.vue'; // Import the new component
 
 const { hasRole, hasPermission } = usePermissions()
 
 useMeta({ title: 'Sub Sectors' });
 
 const search = ref('');
-const columns =
-    ref([
-        { field: 'id', title: '#' },
-        { field: 'name', title: 'Name' },
-        { field: 'action', title: 'Action', sort: false },
-    ]) || [];
-
+const columns = ref([
+    { field: 'id', title: '#' },
+    { field: 'name', title: 'Name' },
+    { field: 'action', title: 'Action', sort: false },
+]) || [];
 
 const subSectorStore = useSubSectorStore();
 const props = defineProps<{
-  id: string | number
+    id: string | number
 }>()
 
 onMounted(() => {
     const sectorId = props.id
-
     subSectorStore.fetchSubSectors(true, sectorId);
 });
+
 const rows = computed(() =>
     subSectorStore.sectors.map((r, i) => ({ ...r, sn: i + 1 }))
 );
+
 const deleteSectorModal = ref(false)
 const selectSectorId = ref(0);
+const addSubSectorModal = ref(false)
+const editSubSectorModal = ref(false)
+const selectedSubSector = ref<any>(null)
 
 const deleteSector = async () => {
     var res = await subSectorStore.deleteSubSector(selectSectorId.value, props.id);
@@ -165,9 +238,21 @@ const deleteSector = async () => {
     } else {
         toast.error(subSectorStore.deleteSubSectorError);
     }
-
 }
 
-</script>
+function handleSubSectorAdded() {
+    addSubSectorModal.value = false
+    subSectorStore.fetchSubSectors(true, props.id) // refresh list
+}
 
+function handleSubSectorUpdated() {
+    editSubSectorModal.value = false
+    subSectorStore.fetchSubSectors(true, props.id) // refresh list
+}
+
+const openEditModal = (subSector: any) => {
+    selectedSubSector.value = subSector
+    editSubSectorModal.value = true
+}
+</script>
 <style></style>

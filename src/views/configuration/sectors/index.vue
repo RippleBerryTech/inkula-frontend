@@ -7,8 +7,13 @@
                 <div class="ltr:ml-auto rtl:mr-auto">
                     <input v-model="search" type="text" class="form-input w-auto" placeholder="Search..." />
                 </div>
-                <router-link :to="{name: 'sector-add'}" v-if="hasPermission('Add Sector')"
-                    class="btn btn-primary" v-tippy="'Add Sector'">Add</router-link>
+                <button 
+                    v-if="hasPermission('Add Sector')" 
+                    class="btn btn-primary" 
+                    v-tippy="'Add Sector'"
+                    @click="addSectorModal = true">
+                    Add
+                </button>
             </div>
 
             <div class="datatable">
@@ -43,12 +48,15 @@
                     <template #action="data">
                         <div class="flex items-center">
                             <div>
-                                <router-link v-if="hasPermission('Edit Sector')"
-                                    :to="{ name: 'sector-edit', params: { id: data.value.id } }"
-                                    @click.stop
-                                    class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'Edit'">
+                                <button
+                                    v-if="hasPermission('Edit Sector')"
+                                    type="button"
+                                    class="ltr:mr-2 rtl:ml-2 group flex items-center"
+                                    v-tippy="'Edit Sector'"
+                                    @click="openEditSectorModal(data.value.id)"
+                                    >
                                     <IconEdit :size="20" stroke-width="1.5" />
-                                </router-link>
+                                </button>
                             </div>
                             <div>
                                 <button v-if="hasPermission('Delete Sector')" type="button" v-tippy="'Delete'">
@@ -110,6 +118,73 @@
         </Dialog>
     </TransitionRoot>
 
+    <!-- Add Sector Modal -->
+    <TransitionRoot appear :show="addSectorModal" as="template">
+    <Dialog as="div" @close="addSectorModal = false" class="relative z-[51]">
+        <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+            leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+        <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-start justify-center px-4 py-8">
+            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+                enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+                leave-to="opacity-0 scale-95">
+            <DialogPanel class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+                <button type="button"
+                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600"
+                @click="addSectorModal = false">
+                <IconX :size="20" stroke-width="1.5" />
+                </button>
+
+                <!-- Inject your Add Sector form here -->
+                <AddSectorForm 
+                    v-if="addSectorModal"
+                    @saved="handleSectorAdded"
+                    @cancel="addSectorModal = false"
+                />
+            </DialogPanel>
+            </TransitionChild>
+        </div>
+        </div>
+    </Dialog>
+    </TransitionRoot>
+
+    <!-- Edit Sector Modal -->
+    <TransitionRoot appear :show="editSectorModal" as="template">
+    <Dialog as="div" @close="editSectorModal = false" class="relative z-[51]">
+        <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+        leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+        <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-start justify-center px-4 py-8">
+            <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+            enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+            leave-to="opacity-0 scale-95">
+            <DialogPanel class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
+                <button type="button"
+                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600"
+                @click="editSectorModal = false">
+                <IconX :size="20" stroke-width="1.5" />
+                </button>
+
+                <EditSectorForm
+                v-if="editSectorModal"
+                :sector-id="selectedSectorId"
+                @saved="handleSectorUpdated"
+                @cancel="editSectorModal = false"
+                />
+            </DialogPanel>
+            </TransitionChild>
+        </div>
+        </div>
+    </Dialog>
+    </TransitionRoot>
+
+
 
 </template>
 <script setup lang="ts">
@@ -129,6 +204,9 @@ import { useSectorStore } from '../../../stores/configuration/sectors';
 
 import { useRouter } from 'vue-router';
 import Loader from '../../components/loader.vue';
+import AddSectorForm from '../../components/sectors/AddSectorForm.vue';
+import EditSectorForm from '../../components/sectors/EditSectorForm.vue';
+
 
 const { hasRole, hasPermission } = usePermissions()
 
@@ -165,11 +243,31 @@ const deleteSector = async () => {
 
 }
 
+const addSectorModal = ref(false)
+
+function handleSectorAdded() {
+  addSectorModal.value = false
+  sectorStore.fetchSectors() // refresh list
+}
+
 const router = useRouter();
 
 function goToSubSectors(row) {
     // row is the sector object (data.value)
     router.push({ name: 'sub-sectors-list', params: { id: row.id } });
+}
+
+const editSectorModal = ref(false)
+const selectedSectorId = ref(0)
+
+function openEditSectorModal(id: number) {
+  selectedSectorId.value = id
+  editSectorModal.value = true
+}
+
+function handleSectorUpdated() {
+  editSectorModal.value = false
+  sectorStore.fetchSectors() // refresh list
 }
 
 </script>
