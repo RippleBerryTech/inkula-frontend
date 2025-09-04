@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, onUnmounted, defineExpose } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { toast } from 'vue3-toastify'
@@ -74,9 +74,27 @@ const rules = {
 const isSubmitForm = ref(false)
 const $v = useVuelidate(rules, { form })
 
+// Reset function
+const resetForm = () => {
+  form.name = ''
+  $v.value.$reset()
+  isSubmitForm.value = false
+  sectorStore.editSectorError = ''
+}
+
+// Call reset when component is unmounted (modal closes)
+onUnmounted(() => {
+  resetForm()
+})
+
+// Expose the reset function to parent component
+defineExpose({
+  resetForm
+})
+
 // Fetch sector details on mount
 onMounted(async () => {
-  sectorStore.editSectorError = ''
+  resetForm() // Clear any previous state
   const sector = await sectorStore.editsector(props.sectorId)
   if (sector) {
     form.name = sector.name
@@ -104,6 +122,7 @@ const submitForm = async () => {
 }
 
 const cancelForm = () => {
+  resetForm()
   emit('cancel')
 }
 </script>

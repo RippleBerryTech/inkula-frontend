@@ -50,7 +50,7 @@
 import { useSectorStore } from '@/stores/configuration/sectors'
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
-import { reactive, ref } from 'vue'
+import { reactive, ref, onUnmounted, defineExpose } from 'vue'
 import { toast } from 'vue3-toastify'
 
 // Reactive form data
@@ -73,6 +73,24 @@ const sectorStore = useSectorStore()
 // Emit events to parent
 const emit = defineEmits(['saved', 'cancel'])
 
+// Reset function
+const resetForm = () => {
+  form.name = ''
+  $v.value.$reset()
+  isSubmitForm.value = false
+  sectorStore.addSectorError = ''
+}
+
+// Call reset when component is unmounted (modal closes)
+onUnmounted(() => {
+  resetForm()
+})
+
+// Expose the reset function to parent component
+defineExpose({
+  resetForm
+})
+
 // Submit handler
 const submitForm = async () => {
   isSubmitForm.value = true
@@ -83,9 +101,7 @@ const submitForm = async () => {
 
     if (res) {
       // Reset form
-      form.name = ''
-      $v.value.$reset()
-      isSubmitForm.value = false
+      resetForm()
 
       // Notify parent
       emit('saved')
@@ -101,12 +117,7 @@ const submitForm = async () => {
 // Cancel handler
 const cancelForm = () => {
   // Reset form and validation
-  form.name = ''
-  $v.value.$reset()
-  isSubmitForm.value = false
-
-  // Reset store error if any
-  sectorStore.addSectorError = ''
+  resetForm()
 
   // Notify parent
   emit('cancel')

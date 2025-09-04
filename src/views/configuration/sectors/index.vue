@@ -92,7 +92,7 @@
 
     <!-- Delete Sector Modal -->
     <TransitionRoot appear :show="deleteSectorModal" as="template">
-        <Dialog as="div" @close="deleteSectorModal = false" class="relative z-[51]">
+        <Dialog as="div" :open="deleteSectorModal" @close="() => {}" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -133,7 +133,7 @@
 
     <!-- Add Sector Modal -->
     <TransitionRoot appear :show="addSectorModal" as="template">
-    <Dialog as="div" @close="addSectorModal = false" class="relative z-[51]">
+    <Dialog as="div" :open="addSectorModal" @close="() => {}" class="relative z-[51]">
         <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
             leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
         <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -146,16 +146,17 @@
                 leave-to="opacity-0 scale-95">
             <DialogPanel class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
                 <button type="button"
-                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600"
-                @click="addSectorModal = false">
-                <IconX :size="20" stroke-width="1.5" />
+                    class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600"
+                    @click="closeAddModal">
+                    <IconX :size="20" stroke-width="1.5" />
                 </button>
 
                 <!-- Inject your Add Sector form here -->
                 <AddSectorForm 
+                    ref="addSectorFormRef"
                     v-if="addSectorModal"
                     @saved="handleSectorAdded"
-                    @cancel="addSectorModal = false"
+                    @cancel="closeAddModal"
                 />
             </DialogPanel>
             </TransitionChild>
@@ -166,7 +167,7 @@
 
     <!-- Edit Sector Modal -->
     <TransitionRoot appear :show="editSectorModal" as="template">
-    <Dialog as="div" @close="editSectorModal = false" class="relative z-[51]">
+    <Dialog as="div" :open="editSectorModal" @close="() => {}" class="relative z-[51]">
         <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
         leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
         <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -179,16 +180,18 @@
             leave-to="opacity-0 scale-95">
             <DialogPanel class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
                 <button type="button"
-                class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600"
-                @click="editSectorModal = false">
-                <IconX :size="20" stroke-width="1.5" />
+                    class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600"
+                    @click="closeEditModal">
+                    <IconX :size="20" stroke-width="1.5" />
                 </button>
 
+                <!-- Add ref to the form component -->
                 <EditSectorForm
-                v-if="editSectorModal"
-                :sector-id="selectedSectorId"
-                @saved="handleSectorUpdated"
-                @cancel="editSectorModal = false"
+                    ref="editSectorFormRef"
+                    v-if="editSectorModal"
+                    :sector-id="selectedSectorId"
+                    @saved="handleSectorUpdated"
+                    @cancel="closeEditModal"
                 />
             </DialogPanel>
             </TransitionChild>
@@ -232,6 +235,9 @@ const columns =
         { field: 'action', title: 'Action', sort: false },
     ]) || [];
 
+// Add refs for form components
+const addSectorFormRef = ref<InstanceType<typeof AddSectorForm> | null>(null)
+const editSectorFormRef = ref<InstanceType<typeof EditSectorForm> | null>(null)
 
 const sectorStore = useSectorStore();
 
@@ -258,9 +264,22 @@ const deleteSector = async () => {
 
 const addSectorModal = ref(false)
 
-function handleSectorAdded() {
+const closeAddModal = () => {
+  if (addSectorFormRef.value) {
+    addSectorFormRef.value.resetForm()
+  }
   addSectorModal.value = false
-  sectorStore.fetchSectors() // refresh list
+}
+const closeEditModal = () => {
+  if (editSectorFormRef.value) {
+    editSectorFormRef.value.resetForm()
+  }
+  editSectorModal.value = false
+}
+
+function handleSectorAdded() {
+    closeAddModal()
+    sectorStore.fetchSectors() // refresh list
 }
 
 const router = useRouter();

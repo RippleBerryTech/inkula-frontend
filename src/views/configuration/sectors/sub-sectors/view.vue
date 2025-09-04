@@ -92,7 +92,7 @@
 
     <!-- Delete Sector Modal -->
     <TransitionRoot appear :show="deleteSectorModal" as="template">
-        <Dialog as="div" @close="deleteSectorModal = false" class="relative z-[51]">
+        <Dialog as="div" @close="editSubSectorModal = false" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -133,7 +133,7 @@
 
     <!-- Add Sub Sector Modal -->
     <TransitionRoot appear :show="addSubSectorModal" as="template">
-        <Dialog as="div" @close="addSubSectorModal = false" class="relative z-[51]">
+        <Dialog as="div" :open="addSubSectorModal" @close="closeAddModal" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -148,12 +148,13 @@
                             class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
                             <button type="button"
                                 class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                @click="addSubSectorModal = false">
+                                @click="closeAddModal">
                                 <IconX :size="20" stroke-width="1.5" />
                             </button>
 
-                            <AddSubSectorForm :sector-id="props.id" @saved="handleSubSectorAdded"
-                                @cancel="addSubSectorModal = false" />
+                            <!-- Add ref to the form component -->
+                            <AddSubSectorForm ref="addSubSectorFormRef" :sector-id="props.id"
+                                @saved="handleSubSectorAdded" @cancel="closeAddModal" />
                         </DialogPanel>
                     </TransitionChild>
                 </div>
@@ -163,7 +164,7 @@
 
     <!-- Edit Sub Sector Modal -->
     <TransitionRoot appear :show="editSubSectorModal" as="template">
-        <Dialog as="div" @close="editSubSectorModal = false" class="relative z-[51]">
+        <Dialog as="div" :open="editSubSectorModal" @close="closeEditModal" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -178,13 +179,14 @@
                             class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
                             <button type="button"
                                 class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                @click="editSubSectorModal = false">
+                                @click="closeEditModal">
                                 <IconX :size="20" stroke-width="1.5" />
                             </button>
 
-                            <EditSubSectorForm v-if="selectedSubSector" :sector-id="props.id"
+                            <!-- Add ref to the form component -->
+                            <EditSubSectorForm ref="editSubSectorFormRef" v-if="selectedSubSector" :sector-id="props.id"
                                 :sub-sector="selectedSubSector" @saved="handleSubSectorUpdated"
-                                @cancel="editSubSectorModal = false" />
+                                @cancel="closeEditModal" />
                         </DialogPanel>
                     </TransitionChild>
                 </div>
@@ -224,6 +226,10 @@ const columns = ref([
     { field: 'name', title: 'Name' },
     { field: 'action', title: 'Action', sort: false },
 ]) || [];
+
+// Add refs for form components
+const addSubSectorFormRef = ref<InstanceType<typeof AddSubSectorForm> | null>(null)
+const editSubSectorFormRef = ref<InstanceType<typeof EditSubSectorForm> | null>(null)
 
 const subSectorStore = useSubSectorStore();
 const sectorStore = useSectorStore(); // Initialize sector store
@@ -274,6 +280,21 @@ const selectSectorId = ref(0);
 const addSubSectorModal = ref(false)
 const editSubSectorModal = ref(false)
 const selectedSubSector = ref<any>(null)
+
+// Modify your close functions
+const closeAddModal = () => {
+  if (addSubSectorFormRef.value) {
+    addSubSectorFormRef.value.resetForm()
+  }
+  addSubSectorModal.value = false
+}
+
+const closeEditModal = () => {
+  if (editSubSectorFormRef.value) {
+    editSubSectorFormRef.value.resetForm()
+  }
+  editSubSectorModal.value = false
+}
 
 const deleteSector = async () => {
     var res = await subSectorStore.deleteSubSector(selectSectorId.value, props.id);

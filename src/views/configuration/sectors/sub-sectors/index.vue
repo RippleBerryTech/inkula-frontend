@@ -1,15 +1,17 @@
 <template>
     <div>
-        <div class="flex items-center mb-4">
-            <router-link :to="{ name: 'sectors-list' }"
-                class="inline-flex items-center justify-center w-10 h-10 rounded-[5px] border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-            </router-link>
-
-        </div>
+        <ul class="flex space-x-2 rtl:space-x-reverse">
+            <li>
+                <a href="javascript:;" class="text-primary hover:underline">Configuration /</a>
+            </li>
+            <li>
+                <router-link v-tippy="'Sectors List'" :to="{ name: 'sectors-list' }"
+                    class="text-primary hover:underline">Sectors</router-link>
+            </li>
+            <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                <span>Sub Sectors</span>
+            </li>
+        </ul>
 
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
@@ -78,7 +80,7 @@
 
     <!-- Delete Sector Modal -->
     <TransitionRoot appear :show="deleteSectorModal" as="template">
-        <Dialog as="div" @close="deleteSectorModal = false" class="relative z-[51]">
+        <Dialog as="div" :open="deleteSectorModal" @close="() => { }" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -119,7 +121,7 @@
 
     <!-- Add Sub Sector Modal -->
     <TransitionRoot appear :show="addSubSectorModal" as="template">
-        <Dialog as="div" @close="addSubSectorModal = false" class="relative z-[51]">
+        <Dialog as="div" :open="addSubSectorModal" @close="closeAddModal" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -134,12 +136,13 @@
                             class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
                             <button type="button"
                                 class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                @click="addSubSectorModal = false">
+                                @click="closeAddModal">
                                 <IconX :size="20" stroke-width="1.5" />
                             </button>
 
-                            <AddSubSectorForm :sector-id="props.id" @saved="handleSubSectorAdded"
-                                @cancel="addSubSectorModal = false" />
+                            <!-- Add ref to the form component -->
+                            <AddSubSectorForm ref="addSubSectorFormRef" :sector-id="props.id"
+                                @saved="handleSubSectorAdded" @cancel="closeAddModal" />
                         </DialogPanel>
                     </TransitionChild>
                 </div>
@@ -149,7 +152,7 @@
 
     <!-- Edit Sub Sector Modal -->
     <TransitionRoot appear :show="editSubSectorModal" as="template">
-        <Dialog as="div" @close="editSubSectorModal = false" class="relative z-[51]">
+        <Dialog as="div" :open="editSubSectorModal" @close="closeEditModal" class="relative z-[51]">
             <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
                 leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                 <DialogOverlay class="fixed inset-0 bg-[black]/60" />
@@ -164,13 +167,14 @@
                             class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg text-black dark:text-white-dark">
                             <button type="button"
                                 class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
-                                @click="editSubSectorModal = false">
+                                @click="closeEditModal">
                                 <IconX :size="20" stroke-width="1.5" />
                             </button>
 
-                            <EditSubSectorForm v-if="selectedSubSector" :sector-id="props.id"
+                            <!-- Add ref to the form component -->
+                            <EditSubSectorForm ref="editSubSectorFormRef" v-if="selectedSubSector" :sector-id="props.id"
                                 :sub-sector="selectedSubSector" @saved="handleSubSectorUpdated"
-                                @cancel="editSubSectorModal = false" />
+                                @cancel="closeEditModal" />
                         </DialogPanel>
                     </TransitionChild>
                 </div>
@@ -209,6 +213,10 @@ const columns = ref([
     { field: 'action', title: 'Action', sort: false },
 ]) || [];
 
+// Add refs for form components
+const addSubSectorFormRef = ref<InstanceType<typeof AddSubSectorForm> | null>(null)
+const editSubSectorFormRef = ref<InstanceType<typeof EditSubSectorForm> | null>(null)
+
 const subSectorStore = useSubSectorStore();
 const props = defineProps<{
     id: string | number
@@ -228,6 +236,21 @@ const selectSectorId = ref(0);
 const addSubSectorModal = ref(false)
 const editSubSectorModal = ref(false)
 const selectedSubSector = ref<any>(null)
+
+// Modify your close functions
+const closeAddModal = () => {
+  if (addSubSectorFormRef.value) {
+    addSubSectorFormRef.value.resetForm()
+  }
+  addSubSectorModal.value = false
+}
+
+const closeEditModal = () => {
+  if (editSubSectorFormRef.value) {
+    editSubSectorFormRef.value.resetForm()
+  }
+  editSubSectorModal.value = false
+}
 
 const deleteSector = async () => {
     var res = await subSectorStore.deleteSubSector(selectSectorId.value, props.id);

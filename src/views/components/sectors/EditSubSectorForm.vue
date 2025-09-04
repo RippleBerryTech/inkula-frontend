@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, onUnmounted, defineExpose } from 'vue'
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { toast } from 'vue3-toastify'
@@ -78,11 +78,29 @@ const rules = {
 const isSubmitForm = ref(false)
 const $v = useVuelidate(rules, { form })
 
+// Reset function
+const resetForm = () => {
+  form.name = props.subSector?.name || ''
+  form.id = Number(props.subSector?.id) || 0
+  form.sector_id = Number(props.sectorId) || 0
+  $v.value.$reset()
+  isSubmitForm.value = false
+  subSectorStore.editSubSectorError = ''
+}
+
+// Call reset when component is unmounted (modal closes)
+onUnmounted(() => {
+  resetForm()
+})
+
+// Expose the reset function to parent component
+defineExpose({
+  resetForm
+})
+
 // Initialize form with existing data
 onMounted(() => {
-  form.name = props.subSector.name
-  form.id = Number(props.subSector.id) // Convert to number
-  form.sector_id = Number(props.sectorId) // Convert to number
+  resetForm()
 })
 
 // Submit handler
@@ -91,7 +109,6 @@ const submitForm = async () => {
   await $v.value.$validate()
 
   if (!$v.value.$invalid) {
-    // Your store method expects a single object with id, sector_id, and name
     const res = await subSectorStore.updateSubSector({
       id: form.id,
       sector_id: form.sector_id,
@@ -110,12 +127,7 @@ const submitForm = async () => {
 
 // Cancel handler
 const cancelForm = () => {
-  form.name = props.subSector.name // Reset to original value
-  form.id = Number(props.subSector.id) // Convert to number
-  form.sector_id = Number(props.sectorId) // Convert to number
-  $v.value.$reset()
-  isSubmitForm.value = false
-  subSectorStore.editSubSectorError = ''
+  resetForm()
   emit('cancel')
 }
 </script>
