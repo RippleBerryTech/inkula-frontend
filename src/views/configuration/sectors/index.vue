@@ -1,6 +1,13 @@
 <template>
     <div>
-
+        <ul class="flex space-x-2 rtl:space-x-reverse">
+            <li>
+                <a href="javascript:;" class="text-primary hover:underline">Configuration</a>
+            </li>
+            <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                <span>Sectors</span>
+            </li>
+        </ul>
         <div class="panel pb-0 mt-6">
             <div class="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                 <h5 class="font-semibold text-lg dark:text-white-light">Sectors List</h5>
@@ -57,6 +64,12 @@
                                     >
                                     <IconEdit :size="20" stroke-width="1.5" />
                                 </button>
+                            </div>
+                             <div>
+                                <router-link v-if="hasPermission('View Sector')" :to="{ name: 'sub-sectors-view', params: { id: data.value.id } }"
+                                    class="ltr:mr-2 rtl:ml-2 group flex items-center" v-tippy="'View'">
+                                    <IconEye :size="24" stroke-width="1.5" />
+                                </router-link>
                             </div>
                             <div>
                                 <button v-if="hasPermission('Delete Sector')" type="button" v-tippy="'Delete'">
@@ -190,7 +203,7 @@
 <script setup lang="ts">
 import Vue3Datatable from '@bhplugin/vue3-datatable';
 import { Dialog, DialogOverlay, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { IconDatabaseOff, IconEdit, IconPlus, IconTrash, IconX } from '@tabler/icons-vue';
+import { IconDatabaseOff, IconEdit, IconPlus, IconTrash, IconX, IconEye } from '@tabler/icons-vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
