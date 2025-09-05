@@ -5,7 +5,7 @@
                 <a href="javascript:;" class="text-primary hover:underline">Configuration /</a>
             </li>
             <li>
-                <router-link v-tippy="'Sectors List'" :to="{ name: 'sectors-list' }"
+                <router-link :to="{ name: 'sectors-list' }"
                     class="text-primary hover:underline">Sectors</router-link>
             </li>
             <li class="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">

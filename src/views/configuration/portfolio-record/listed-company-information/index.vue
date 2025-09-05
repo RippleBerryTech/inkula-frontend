@@ -9,7 +9,7 @@
                 </div>
                 <div>
                     <button class="btn btn-primary" v-if="hasPermission('Add Portfolio Record')" type="button"
-                        v-tippy="'Import Portfolio Records'" @click="importPortfolioRecordModal = true;">
+                        @click="importPortfolioRecordModal = true;">
                         Import
                     </button>
                 </div>
@@ -244,6 +244,13 @@
                                             <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                                         </template>
 
+                                        <!-- Frontend errors -->
+                                        <template v-if="isSubmitAddForm && $vAdd.form.website.$error">
+                                            <p v-for="error in $vAdd.form.website.$errors" :key="error.$uid" class="text-danger mt-1">
+                                            <span v-if="error.$validator === 'validWebsiteDomain'">{{ error.$message }}</span>
+                                            </p>
+                                        </template>
+
                                         <!-- Backend error -->
                                         <template v-if="backendErrors.website">
                                             <p class="text-danger mt-1">{{ backendErrors.website }}</p>
@@ -318,9 +325,9 @@
                                         </template>
 
                                         <!-- Frontend errors -->
-                                        <template v-if="isSubmitEditForm && $vEdit.form.name.$error">
-                                            <p v-for="error in $vEdit.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
-                                                <span v-if="error.$validator === 'required'">Name is required</span>
+                                        <template v-if="isSubmitEditForm && $vEdit.form.website.$error">
+                                            <p v-for="error in $vEdit.form.website.$errors" :key="error.$uid" class="text-danger mt-1">
+                                                <span v-if="error.$validator === 'validWebsiteDomain'">{{ error.$message }}</span>
                                             </p>
                                         </template>
 
@@ -497,10 +504,16 @@ const addForm = reactive({
   website: '',
 });
 
+// Add custom validator for website domain
+const validWebsiteDomain = (value) => {
+  if (!value) return true; // Allow empty values
+  return /\.(com|net)$/i.test(value);
+};
+
 const addRules = {
   form:{
     name: { required },
-    website: {},
+    website: {validWebsiteDomain: helpers.withMessage('Website must be a .com or .net domain', validWebsiteDomain)},
   }
 };
 
@@ -517,7 +530,7 @@ const editForm = reactive({
 const editRules = {
     form:{
         name: { required },
-        website: {},
+        website: { validWebsiteDomain: helpers.withMessage('Website must be a .com or .net domain', validWebsiteDomain)},
     }
 };
 
@@ -638,6 +651,7 @@ const submitEditForm = async () => {
     }
   }
 };
+
 </script>
 
 <style></style>

@@ -17,7 +17,6 @@
                 <button 
                     v-if="hasPermission('Add Sector')" 
                     class="btn btn-primary" 
-                    v-tippy="'Add Sector'"
                     @click="addSectorModal = true">
                     Add
                 </button>

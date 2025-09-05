@@ -9,11 +9,11 @@
                 </div>
                 <div>
                     <button class="btn btn-primary" v-if="hasPermission('Add Economic Submission')" type="button"
-                        v-tippy="'Import Economic Submission'" @click="importEconomicSubmissionModal = true;">
+                        @click="importEconomicSubmissionModal = true;">
                         Import
                     </button>
                 </div>
-                <router-link v-tippy="'Add Economic Submission'" to="/economic-and-capital-market-information/macro-economic-data/add" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add</router-link>
+                <router-link :to="{name: 'macro-economic-data-add'}" v-if="hasPermission('Add Economic Submission')" class="btn btn-primary">Add</router-link>
             </div>
 
             <div class="datatable">
