@@ -217,13 +217,6 @@
                                             <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                                         </template>
 
-                                        <!-- Frontend errors -->
-                                        <template v-if="isSubmitAddForm && $vAdd.form.name.$error">
-                                            <p v-for="error in $vAdd.form.name.$errors" :key="error.$uid" class="text-danger mt-1">
-                                                <span v-if="error.$validator === 'required'">Name is required</span>
-                                            </p>
-                                        </template>
-
                                         <!-- Backend error -->
                                         <template v-if="backendErrors.name">
                                             <p class="text-danger mt-1">{{ backendErrors.name }}</p>
@@ -247,7 +240,7 @@
                                         <!-- Frontend errors -->
                                         <template v-if="isSubmitAddForm && $vAdd.form.website.$error">
                                             <p v-for="error in $vAdd.form.website.$errors" :key="error.$uid" class="text-danger mt-1">
-                                            <span v-if="error.$validator === 'validWebsiteDomain'">{{ error.$message }}</span>
+                                                <span v-if="error.$validator === 'isValidUrl'">{{ error.$message }}</span>
                                             </p>
                                         </template>
 
@@ -324,13 +317,6 @@
                                             <p class="text-[#1abc9c] mt-1">Looks Good!</p>
                                         </template>
 
-                                        <!-- Frontend errors -->
-                                        <template v-if="isSubmitEditForm && $vEdit.form.website.$error">
-                                            <p v-for="error in $vEdit.form.website.$errors" :key="error.$uid" class="text-danger mt-1">
-                                                <span v-if="error.$validator === 'validWebsiteDomain'">{{ error.$message }}</span>
-                                            </p>
-                                        </template>
-
                                         <!-- Backend error -->
                                         <template v-if="backendErrors.name">
                                             <p class="text-danger mt-1">{{ backendErrors.name }}</p>
@@ -349,6 +335,13 @@
                                         <!-- Looks Good -->
                                         <template v-if="isSubmitEditForm && !$vEdit.form.website.$error && !backendErrors.website">
                                             <p class="text-[#1abc9c] mt-1">Looks Good!</p>
+                                        </template>
+
+                                        <!-- Frontend errors -->
+                                        <template v-if="isSubmitEditForm && $vEdit.form.website.$error">
+                                            <p v-for="error in $vEdit.form.website.$errors" :key="error.$uid" class="text-danger mt-1">
+                                                <span v-if="error.$validator === 'isValidUrl'">{{ error.$message }}</span>
+                                            </p>
                                         </template>
 
                                         <!-- Backend error -->
@@ -504,16 +497,26 @@ const addForm = reactive({
   website: '',
 });
 
-// Add custom validator for website domain
-const validWebsiteDomain = (value) => {
+// Simple but effective URL validation
+const isValidUrl = (value) => {
   if (!value) return true; // Allow empty values
-  return /\.(com|net)$/i.test(value);
+  
+  // Test for valid domain structure: something.something
+  const domainPattern = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;
+  
+  // Remove protocol and www for validation
+  let cleanValue = value.replace(/^(https?:\/\/)?(www\.)?/i, '');
+  
+  // Remove trailing slash and any path/query parameters
+  cleanValue = cleanValue.replace(/\/.*$/, '');
+  
+  return domainPattern.test(cleanValue);
 };
 
 const addRules = {
   form:{
     name: { required },
-    website: {validWebsiteDomain: helpers.withMessage('Website must be a .com or .net domain', validWebsiteDomain)},
+    website: {isValidUrl: helpers.withMessage('Please enter a valid URL', isValidUrl)},
   }
 };
 
@@ -530,7 +533,7 @@ const editForm = reactive({
 const editRules = {
     form:{
         name: { required },
-        website: { validWebsiteDomain: helpers.withMessage('Website must be a .com or .net domain', validWebsiteDomain)},
+        website: {isValidUrl: helpers.withMessage('Please enter a valid URL', isValidUrl)},
     }
 };
 
@@ -605,8 +608,20 @@ const submitAddForm = async () => {
   await $vAdd.value.$validate();
   
   if (!$vAdd.value.$invalid) {
-    if (addForm.website && !addForm.website.startsWith("http://") && !addForm.website.startsWith("https://")) {
-      addForm.website = "https://" + addForm.website;
+    // Normalize the URL before submitting
+    let websiteUrl = addForm.website;
+    if (websiteUrl) {
+      try {
+        // If it's a valid URL without protocol, add https://
+        if (!websiteUrl.startsWith("http://") && !websiteUrl.startsWith("https://")) {
+          websiteUrl = "https://" + websiteUrl;
+        }
+        // For the validation we already checked the domain is valid
+        addForm.website = websiteUrl;
+      } catch (error) {
+        // If normalization fails, let the backend handle the error
+        console.warn('URL normalization failed:', error);
+      }
     }
     
     const res = await listedCompanyInformationStore.addListedCompanyInformation(addForm);
@@ -630,8 +645,20 @@ const submitEditForm = async () => {
   await $vEdit.value.$validate();
   
   if (!$vEdit.value.$invalid) {
-    if (editForm.website && !editForm.website.startsWith("http://") && !editForm.website.startsWith("https://")) {
-      editForm.website = "https://" + editForm.website;
+    // Normalize the URL before submitting
+    let websiteUrl = editForm.website;
+    if (websiteUrl) {
+      try {
+        // If it's a valid URL without protocol, add https://
+        if (!websiteUrl.startsWith("http://") && !websiteUrl.startsWith("https://")) {
+          websiteUrl = "https://" + websiteUrl;
+        }
+        // For the validation we already checked the domain is valid
+        editForm.website = websiteUrl;
+      } catch (error) {
+        // If normalization fails, let the backend handle the error
+        console.warn('URL normalization failed:', error);
+      }
     }
     
     const ok = await listedCompanyInformationStore.updateListedCompanyInformation({
@@ -651,7 +678,6 @@ const submitEditForm = async () => {
     }
   }
 };
-
 </script>
 
 <style></style>

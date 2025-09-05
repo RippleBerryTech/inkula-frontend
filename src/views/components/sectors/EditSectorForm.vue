@@ -7,8 +7,8 @@
         <!-- Sector Name -->
         <div class="flex-1"
           :class="{ 'has-error': $v.form.name.$error, 'has-success': isSubmitForm && !$v.form.name.$error }">
-          <label for="name">Sector Name</label>
-          <input id="name" type="text" placeholder="Enter Sector Name" class="form-input" v-model="form.name" />
+          <label for="name">Name</label>
+          <input id="name" type="text" placeholder="Enter Name" class="form-input" v-model="form.name" />
           <template v-if="isSubmitForm && !$v.form.name.$error">
             <p class="text-[#1abc9c] mt-1">Looks Good!</p>
           </template>
