@@ -5,7 +5,7 @@ import api from '../plugins/axios';
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         user: null as null | Record<string, any>,
-        token: localStorage.getItem('token') || '',
+        token: localStorage.getItem('token') || null,
         error: '',
         loading: false,
         message: '',
@@ -25,7 +25,7 @@ export const useAuthStore = defineStore('auth', {
                     this.emailForOTP = res.data.data.user.email;
                     if (res.data.data.token != null) {
                         this.token = res.data.data.token;
-                        localStorage.setItem('token', this.token);
+                        localStorage.setItem('token', this.token!);
                         // 👇 Fetch user info (sets user, roles, permissions in store)
                         await this.fetchUser();
                     }
@@ -70,7 +70,7 @@ export const useAuthStore = defineStore('auth', {
                 if (res.data.success) {
                     this.message = res.data.message;
                     this.token = res.data.data.token;
-                    localStorage.setItem('token', this.token);
+                    localStorage.setItem('token', this.token!);
                     // 👇 Fetch user info (sets user, roles, permissions in store)
                     await this.fetchUser();
                     return res.data.success;
@@ -201,7 +201,16 @@ export const useAuthStore = defineStore('auth', {
             } finally {
                 this.loading = false
             }
-        }
+        },
+        setToken(token: string | null) {
+            this.token = token
+            if (token) {
+                localStorage.setItem('token', token)
+            } else {
+                localStorage.removeItem('token')
+                this.token = null
+            }
+        },
 
     },
 });

@@ -1,5 +1,5 @@
 import App from '@/App.vue';
-import { createApp } from 'vue';
+import { createApp, watch } from 'vue';
 
 const app = createApp(App);
 
@@ -67,4 +67,12 @@ const auth = useAuthStore()
 if (auth.token) {
     auth.fetchUser()
 }
+watch(
+  () => auth.token,
+  (val) => {
+    if (!val) {
+      router.push({ name: 'login' })
+    }
+  }
+)
 app.mount('#app');

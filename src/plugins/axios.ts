@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 
 const api = axios.create({
@@ -22,6 +23,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       window.location.href = '/login'; // or use router.push
+      const auth = useAuthStore()
+      auth.setToken(null)
     }
     return Promise.reject(error);
   }
